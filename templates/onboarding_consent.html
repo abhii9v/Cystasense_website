@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Consent & Disclaimers - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-3">Consent & Disclaimers</h2>
+                <p class="text-muted">Please review and accept the following terms to continue.</p>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted">Step 2 of 4</small>
+            </div>
+
+            <form id="consentForm">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                            Important Notice
+                        </h5>
+                        <div class="alert alert-info">
+                            <strong>This platform is NOT a diagnostic tool.</strong> CystaSense provides educational resources, 
+                            tracking tools, and support for managing PCOS symptoms. It does not replace professional medical 
+                            advice, diagnosis, or treatment. Always consult with qualified healthcare providers for medical decisions.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-shield-check text-primary me-2"></i>
+                            Data Consent (Required)
+                        </h5>
+                        <p class="text-muted mb-3">
+                            We collect and process your health data to provide personalized recommendations, 
+                            track your progress, and improve your experience. Your data is encrypted, secure, 
+                            and never shared without your explicit permission.
+                        </p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="dataConsent" name="data_consent" required>
+                            <label class="form-check-label" for="dataConsent">
+                                <strong>I consent to CystaSense collecting and processing my health data</strong> 
+                                as described in the <a href="#" target="_blank">Privacy Policy</a>.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-clipboard-data text-primary me-2"></i>
+                            Research Consent (Optional)
+                        </h5>
+                        <p class="text-muted mb-3">
+                            Help advance PCOS research! By opting in, you allow us to use your anonymized data 
+                            for research purposes. Your identity will never be revealed, and you can withdraw 
+                            consent at any time.
+                        </p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="researchConsent" name="research_consent">
+                            <label class="form-check-label" for="researchConsent">
+                                <strong>I consent to my anonymized data being used for research</strong> 
+                                to help improve PCOS understanding and treatment.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('onboarding_role') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        Continue <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('consentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        data_consent: document.getElementById('dataConsent').checked,
+        research_consent: document.getElementById('researchConsent').checked
+    };
+    
+    fetch('{{ url_for("onboarding_consent") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.href = data.next;
+        }
+    });
+});
+</script>
+{% endblock %}

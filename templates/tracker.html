@@ -1,0 +1,841 @@
+{% extends "base.html" %}
+
+{% block title %}Health Tracker - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-graph-up"></i> Health Tracker</h1>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary active" onclick="showTab('symptoms')">
+                <i class="bi bi-clipboard-data"></i> Symptoms
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="showTab('cycle')">
+                <i class="bi bi-calendar-heart"></i> Cycle
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="showTab('history')">
+                <i class="bi bi-clock-history"></i> History
+            </button>
+        </div>
+    </div>
+    
+    <!-- Symptoms Tab -->
+    <div id="symptomsTab" class="tab-content">
+        <div class="row g-4">
+            <!-- Quick Log Section -->
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3"><i class="bi bi-lightning-fill"></i> Quick Log Common Symptoms</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary" onclick="quickLog('headache')">
+                                🤕 Headache
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="quickLog('fatigue')">
+                                😴 Fatigue
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="quickLog('mood_swings')">
+                                😢 Mood Swings
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="quickLog('bloating')">
+                                🎈 Bloating
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="quickLog('acne')">
+                                🔴 Acne Flare-up
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="quickLog('anxiety')">
+                                😰 Anxiety
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Symptom Tracker -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white;">
+                        <h4 class="mb-0"><i class="bi bi-clipboard-data"></i> Detailed Symptom Log</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="symptomForm">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">📅 Date</label>
+                                <input type="date" class="form-control form-control-lg" id="symptomDate" required>
+                                <small class="text-muted">When did you experience these symptoms?</small>
+                            </div>
+                            
+                            <h5 class="mb-3 text-primary">Physical Symptoms</h5>
+                            
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">🔴 Acne Severity</label>
+                                    <div class="severity-container">
+                                        <input type="range" class="form-range" min="0" max="5" id="acneSeverity" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>None</span>
+                                            <span>Mild</span>
+                                            <span>Severe</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="acneValue">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">😴 Fatigue Level</label>
+                                    <div class="severity-container">
+                                        <input type="range" class="form-range" min="0" max="5" id="fatigueLevel" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>None</span>
+                                            <span>Moderate</span>
+                                            <span>Extreme</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="fatigueValue">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">⚖️ Weight Gain</label>
+                                    <div class="severity-container">
+                                        <input type="range" class="form-range" min="0" max="5" id="weightGainLevel" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>None</span>
+                                            <span>Moderate</span>
+                                            <span>Significant</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="weightGainValue">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">🎈 Bloating</label>
+                                    <div class="severity-container">
+                                        <input type="range" class="form-range" min="0" max="5" id="bloatingLevel" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>None</span>
+                                            <span>Moderate</span>
+                                            <span>Severe</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="bloatingValue">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mb-3 text-primary">Emotional Well-being</h5>
+                            
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">😢 Mood Swings</label>
+                                    <div class="severity-container">
+                                        <input type="range" class="form-range" min="0" max="5" id="moodSwings" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>Stable</span>
+                                            <span>Moderate</span>
+                                            <span>Intense</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="moodValue">Stable</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">😰 Anxiety Level</label>
+                                    <div class="severity-container">
+                                        <input type="range" class="form-range" min="0" max="5" id="anxietyLevel" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>Calm</span>
+                                            <span>Moderate</span>
+                                            <span>High</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="anxietyValue">Calm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mb-3 text-primary">Other Symptoms</h5>
+                            
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">💇 Hair Loss</label>
+                                    <div class="severity-container">
+                                        <input type="range" class="form-range" min="0" max="5" id="hairLossLevel" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>None</span>
+                                            <span>Moderate</span>
+                                            <span>Severe</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="hairLossValue">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">➕ Custom Symptom (Optional)</label>
+                                    <input type="text" class="form-control mb-2" id="customSymptom" placeholder="e.g., Headache, Joint pain, etc.">
+                                    <div class="severity-container" id="customSeverityContainer" style="display: none;">
+                                        <input type="range" class="form-range" min="0" max="5" id="customSymptomLevel" value="0">
+                                        <div class="d-flex justify-content-between small text-muted">
+                                            <span>None</span>
+                                            <span>Moderate</span>
+                                            <span>Severe</span>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <span class="badge bg-secondary fs-6" id="customSymptomValue">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">📝 Additional Notes</label>
+                                <textarea class="form-control" id="symptomNotes" rows="3" placeholder="Any additional details about your symptoms today..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-save"></i> Log Symptoms
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tips Sidebar -->
+            <div class="col-lg-4">
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">💡 Tracking Tips</h5>
+                        <ul class="small">
+                            <li>Log symptoms daily for best insights</li>
+                            <li>Be honest about severity levels</li>
+                            <li>Note any patterns you observe</li>
+                            <li>Track before/after lifestyle changes</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card border-info">
+                    <div class="card-body">
+                        <h5 class="card-title text-info">📊 Your Progress</h5>
+                        <p class="small text-muted">Keep tracking to see patterns and improvements over time!</p>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ tracking_percentage|default(0) }}%" id="trackingProgress">
+                                {{ tracking_percentage|default(0) }}% Complete
+                            </div>
+                        </div>
+                        <small class="text-muted">This week: <strong id="daysTracked">{{ days_tracked|default(0) }}/7 days</strong></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cycle Tab -->
+    <div id="cycleTab" class="tab-content" style="display: none;">
+        <div class="row g-4">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #e91e63, #f06292); color: white;">
+                        <h4 class="mb-0"><i class="bi bi-calendar-heart"></i> Menstrual Cycle Tracker</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="cycleForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">📅 Cycle Start Date</label>
+                                    <input type="date" class="form-control form-control-lg" id="startDate" required>
+                                    <small class="text-muted">First day of your period</small>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">📅 Cycle End Date</label>
+                                    <input type="date" class="form-control form-control-lg" id="endDate">
+                                    <small class="text-muted">Last day of your period</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4 mt-3">
+                                <label class="form-label fw-bold">💧 Flow Intensity</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="flowIntensity" id="flowLight" value="light">
+                                    <label class="btn btn-outline-primary" for="flowLight">
+                                        <i class="bi bi-droplet"></i> Light
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="flowIntensity" id="flowMedium" value="medium">
+                                    <label class="btn btn-outline-primary" for="flowMedium">
+                                        <i class="bi bi-droplet-fill"></i> Medium
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="flowIntensity" id="flowHeavy" value="heavy">
+                                    <label class="btn btn-outline-primary" for="flowHeavy">
+                                        <i class="bi bi-droplet-fill"></i><i class="bi bi-droplet-fill"></i> Heavy
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">🤕 Cramps Severity</label>
+                                <div class="severity-container">
+                                    <input type="range" class="form-range" min="0" max="5" id="crampsSeverity" value="0">
+                                    <div class="d-flex justify-content-between small text-muted">
+                                        <span>None</span>
+                                        <span>Moderate</span>
+                                        <span>Severe</span>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <span class="badge bg-secondary fs-6" id="crampsValue">None</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">😊 Mood Changes</label>
+                                <input type="text" class="form-control" id="moodChanges" placeholder="e.g., irritable, emotional, anxious, happy">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">📝 Other Symptoms</label>
+                                <textarea class="form-control" id="otherSymptoms" rows="3" placeholder="Headaches, breast tenderness, back pain, etc."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success btn-lg w-100">
+                                <i class="bi bi-save"></i> Log Cycle Data
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- History Tab -->
+    <div id="historyTab" class="tab-content" style="display: none;">
+        <div class="row g-4">
+            <!-- Symptom History -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-clipboard-data"></i> Symptom History</h5>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        {% if symptom_history %}
+                            {% for entry in symptom_history %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-calendar-check text-primary"></i>
+                                            {{ entry.date.strftime('%B %d, %Y') }}
+                                        </h6>
+                                        <small class="text-muted">{{ entry.date.strftime('%A') }}</small>
+                                    </div>
+                                    <span class="badge bg-secondary">
+                                        {% set total = (entry.acne_severity or 0) + (entry.fatigue_level or 0) + (entry.mood_swings or 0) + (entry.anxiety_level or 0) %}
+                                        {% if total <= 5 %}Low{% elif total <= 10 %}Medium{% else %}High{% endif %}
+                                    </span>
+                                </div>
+                                
+                                <div class="row g-2 small">
+                                    {% if entry.acne_severity %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            🔴 Acne: {{ entry.acne_severity }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if entry.fatigue_level %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            😴 Fatigue: {{ entry.fatigue_level }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if entry.weight_gain_level %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            ⚖️ Weight Gain: {{ entry.weight_gain_level }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if entry.bloating_level %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            🎈 Bloating: {{ entry.bloating_level }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if entry.hair_loss_level %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            💇 Hair Loss: {{ entry.hair_loss_level }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if entry.mood_swings %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            😢 Mood: {{ entry.mood_swings }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if entry.anxiety_level %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            😰 Anxiety: {{ entry.anxiety_level }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if entry.notes and 'Custom Symptom:' in entry.notes %}
+                                        {% set custom_parts = entry.notes.split('Custom Symptom:')[1].split('(') %}
+                                        {% set custom_name = custom_parts[0].strip() %}
+                                        {% set custom_severity = custom_parts[1].replace(')', '').strip() if custom_parts|length > 1 else '' %}
+                                        {% set severity_map = {'None': 0, 'Very Mild': 1, 'Mild': 2, 'Moderate': 3, 'Severe': 4, 'Very Severe': 5} %}
+                                        {% set severity_num = severity_map.get(custom_severity, 0) %}
+                                    <div class="col-6">
+                                        <span class="badge bg-light text-dark border">
+                                            ➕ {{ custom_name }}: {{ severity_num }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if entry.notes and 'Custom Symptom:' not in entry.notes %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-chat-left-text"></i> {{ entry.notes }}
+                                    </small>
+                                </div>
+                                {% elif entry.notes and '\n\n' in entry.notes %}
+                                    {% set regular_notes = entry.notes.split('\n\nCustom Symptom:')[0] %}
+                                    {% if regular_notes %}
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-chat-left-text"></i> {{ regular_notes }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-5">
+                                <i class="bi bi-inbox" style="font-size: 3rem;"></i><br>
+                                No symptom history yet. Start tracking to see your history here!
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cycle History -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-header" style="background: linear-gradient(135deg, #e91e63, #f06292); color: white;">
+                        <h5 class="mb-0"><i class="bi bi-calendar-heart"></i> Cycle History</h5>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        {% if cycle_history %}
+                            {% for cycle in cycle_history %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-calendar-check" style="color: #e91e63;"></i>
+                                            {{ cycle.start_date.strftime('%B %d, %Y') }}
+                                        </h6>
+                                        {% if cycle.end_date %}
+                                        <small class="text-muted">
+                                            to {{ cycle.end_date.strftime('%B %d, %Y') }}
+                                            {% if cycle.cycle_length %}
+                                                ({{ cycle.cycle_length }} days)
+                                            {% endif %}
+                                        </small>
+                                        {% else %}
+                                        <small class="text-muted">Ongoing</small>
+                                        {% endif %}
+                                    </div>
+                                    {% if cycle.flow_intensity %}
+                                    <span class="badge" style="background-color: {% if cycle.flow_intensity == 'heavy' %}#dc3545{% elif cycle.flow_intensity == 'medium' %}#ffc107{% else %}#6c757d{% endif %}">
+                                        {{ cycle.flow_intensity|capitalize }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row g-2 small">
+                                    {% if cycle.cramps_severity %}
+                                    <div class="col-12">
+                                        <span class="badge bg-light text-dark border">
+                                            🤕 Cramps: {{ cycle.cramps_severity }}/5
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if cycle.mood_changes %}
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            <i class="bi bi-emoji-smile"></i> Mood: {{ cycle.mood_changes }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if cycle.other_symptoms %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-chat-left-text"></i> {{ cycle.other_symptoms }}
+                                    </small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-5">
+                                <i class="bi bi-inbox" style="font-size: 3rem;"></i><br>
+                                No cycle history yet. Start tracking to see your history here!
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tab-content {
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.severity-container {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.form-check-lg .form-check-input {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0.125rem;
+}
+
+.form-check-lg .form-check-label {
+    margin-left: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+}
+</style>
+
+<script>
+// Tab switching
+function showTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + 'Tab').style.display = 'block';
+    
+    // Update button states
+    document.querySelectorAll('.btn-group button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.closest('button').classList.add('active');
+}
+
+// Severity descriptions
+const severityLabels = {
+    acne: ['None', 'Very Mild', 'Mild', 'Moderate', 'Severe', 'Very Severe'],
+    fatigue: ['None', 'Slightly Tired', 'Tired', 'Very Tired', 'Exhausted', 'Extreme'],
+    mood: ['Stable', 'Slight Changes', 'Noticeable', 'Moderate', 'Significant', 'Extreme'],
+    anxiety: ['Calm', 'Slightly Anxious', 'Anxious', 'Very Anxious', 'High Anxiety', 'Severe'],
+    cramps: ['None', 'Very Mild', 'Mild', 'Moderate', 'Severe', 'Unbearable'],
+    weightGain: ['None', 'Slight', 'Noticeable', 'Moderate', 'Significant', 'Very Significant'],
+    bloating: ['None', 'Slight', 'Noticeable', 'Moderate', 'Severe', 'Very Severe'],
+    hairLoss: ['None', 'Slight', 'Noticeable', 'Moderate', 'Significant', 'Severe'],
+    custom: ['None', 'Very Mild', 'Mild', 'Moderate', 'Severe', 'Very Severe']
+};
+
+const severityColors = ['secondary', 'success', 'info', 'warning', 'orange', 'danger'];
+
+// Update range input displays with better feedback
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for tab parameter in URL and switch to that tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam === 'history') {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        // Show history tab
+        document.getElementById('historyTab').style.display = 'block';
+        // Update button states
+        document.querySelectorAll('.btn-group button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelectorAll('.btn-group button')[2].classList.add('active');
+    }
+    
+    const ranges = {
+        'acneSeverity': { display: 'acneValue', labels: severityLabels.acne },
+        'fatigueLevel': { display: 'fatigueValue', labels: severityLabels.fatigue },
+        'moodSwings': { display: 'moodValue', labels: severityLabels.mood },
+        'anxietyLevel': { display: 'anxietyValue', labels: severityLabels.anxiety },
+        'crampsSeverity': { display: 'crampsValue', labels: severityLabels.cramps },
+        'weightGainLevel': { display: 'weightGainValue', labels: severityLabels.weightGain },
+        'bloatingLevel': { display: 'bloatingValue', labels: severityLabels.bloating },
+        'hairLossLevel': { display: 'hairLossValue', labels: severityLabels.hairLoss },
+        'customSymptomLevel': { display: 'customSymptomValue', labels: severityLabels.custom }
+    };
+    
+    Object.keys(ranges).forEach(rangeId => {
+        const range = document.getElementById(rangeId);
+        const config = ranges[rangeId];
+        const display = document.getElementById(config.display);
+        
+        range.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            display.textContent = config.labels[value];
+            display.className = `badge bg-${severityColors[value]} fs-6`;
+        });
+    });
+    
+    // Show/hide custom symptom severity slider
+    const customSymptomInput = document.getElementById('customSymptom');
+    const customSeverityContainer = document.getElementById('customSeverityContainer');
+    
+    customSymptomInput.addEventListener('input', function() {
+        if (this.value.trim().length > 0) {
+            customSeverityContainer.style.display = 'block';
+        } else {
+            customSeverityContainer.style.display = 'none';
+            document.getElementById('customSymptomLevel').value = 0;
+            document.getElementById('customSymptomValue').textContent = 'None';
+            document.getElementById('customSymptomValue').className = 'badge bg-secondary fs-6';
+        }
+    });
+    
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('symptomDate').value = today;
+    document.getElementById('startDate').value = today;
+});
+
+// Toast notification system
+function showToast(message, type = 'success') {
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+    
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toast = document.querySelector('.toast:last-child');
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    setTimeout(() => {
+        if (toast && toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+// Quick log function
+function quickLog(symptomType) {
+    const symptomMap = {
+        'headache': 'Headache',
+        'fatigue': 'Feeling fatigued',
+        'mood_swings': 'Mood swings',
+        'bloating': 'Bloating',
+        'acne': 'Acne flare-up',
+        'anxiety': 'Feeling anxious'
+    };
+    
+    const data = {
+        date: new Date().toISOString().split('T')[0],
+        acne_severity: symptomType === 'acne' ? 3 : null,
+        hair_loss_level: null,
+        weight_gain_level: null,
+        fatigue_level: symptomType === 'fatigue' ? 3 : null,
+        bloating_level: symptomType === 'bloating' ? 3 : null,
+        mood_swings: symptomType === 'mood_swings' ? 3 : null,
+        anxiety_level: symptomType === 'anxiety' ? 3 : null,
+        notes: `Quick log: ${symptomMap[symptomType]}`
+    };
+    
+    fetch('/tracker/symptoms', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast(`✅ ${symptomMap[symptomType]} logged successfully!`, 'success');
+        } else {
+            showToast('Failed to log symptom. Please try again.', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error logging symptom. Please try again.', 'danger');
+    });
+}
+
+// Handle symptom form submission
+document.getElementById('symptomForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+    submitBtn.disabled = true;
+    
+    // Build notes with custom symptom if provided
+    let notes = document.getElementById('symptomNotes').value;
+    const customSymptom = document.getElementById('customSymptom').value.trim();
+    const customLevel = parseInt(document.getElementById('customSymptomLevel').value);
+    
+    if (customSymptom) {
+        const customSeverity = severityLabels.custom[customLevel];
+        notes = notes ? `${notes}\n\nCustom Symptom: ${customSymptom} (${customSeverity})` : `Custom Symptom: ${customSymptom} (${customSeverity})`;
+    }
+    
+    const data = {
+        date: document.getElementById('symptomDate').value,
+        acne_severity: parseInt(document.getElementById('acneSeverity').value) || null,
+        fatigue_level: parseInt(document.getElementById('fatigueLevel').value) || null,
+        weight_gain_level: parseInt(document.getElementById('weightGainLevel').value) || null,
+        bloating_level: parseInt(document.getElementById('bloatingLevel').value) || null,
+        hair_loss_level: parseInt(document.getElementById('hairLossLevel').value) || null,
+        mood_swings: parseInt(document.getElementById('moodSwings').value) || null,
+        anxiety_level: parseInt(document.getElementById('anxietyLevel').value) || null,
+        notes: notes
+    };
+    
+    fetch('/tracker/symptoms', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('✅ Symptoms logged successfully! Redirecting to history...', 'success');
+            // Reload page after a short delay to show toast, then switch to history tab
+            setTimeout(() => {
+                window.location.href = '/tracker?tab=history';
+            }, 1000);
+        } else {
+            showToast('Failed to log symptoms. Please try again.', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error logging symptoms. Please try again.', 'danger');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+
+// Handle cycle form submission
+document.getElementById('cycleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+    submitBtn.disabled = true;
+    
+    const flowIntensity = document.querySelector('input[name="flowIntensity"]:checked');
+    
+    // Calculate cycle length from dates
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    let cycleLength = null;
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        cycleLength = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+    }
+    
+    const data = {
+        start_date: startDate,
+        end_date: endDate || null,
+        cycle_length: cycleLength,
+        flow_intensity: flowIntensity ? flowIntensity.value : null,
+        cramps_severity: parseInt(document.getElementById('crampsSeverity').value) || null,
+        mood_changes: document.getElementById('moodChanges').value || null,
+        other_symptoms: document.getElementById('otherSymptoms').value || null
+    };
+    
+    fetch('/tracker/cycle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('✅ Cycle data logged successfully! Keep tracking for better insights.', 'success');
+            document.getElementById('cycleForm').reset();
+            // Reset date to today
+            document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+        } else {
+            showToast('Failed to log cycle data. Please try again.', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error logging cycle data. Please try again.', 'danger');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+</script>
+{% endblock %}

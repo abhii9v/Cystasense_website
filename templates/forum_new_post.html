@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}New Post - {{ category.name }} - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum') }}">Forum</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum_category', category_id=category.id) }}">{{ category.name }}</a></li>
+            <li class="breadcrumb-item active">New Post</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Create New Post in {{ category.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <form id="newPostForm">
+                        <div class="mb-3">
+                            <label for="postTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="postTitle" placeholder="What's your question or topic?" required>
+                            <div id="titleWarning" class="alert alert-warning mt-2 d-none" role="alert"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="postContent" class="form-label">Content</label>
+                            <textarea class="form-control" id="postContent" rows="10" placeholder="Share your thoughts, experiences, or questions..." required></textarea>
+                            <div id="contentWarning" class="alert alert-warning mt-2 d-none" role="alert"></div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Post
+                            </button>
+                            <a href="{{ url_for('forum_category', category_id=category.id) }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">Posting Guidelines</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Be respectful and supportive
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Use clear and descriptive titles
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Share your experiences honestly
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Ask questions freely
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-x-circle text-danger"></i> No medical advice - consult professionals
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-x-circle text-danger"></i> No spam or promotional content
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Content moderation - inappropriate words list
+const inappropriateWords = {
+    'stupid': 'unwise, not helpful, confusing',
+    'idiot': 'person, individual, someone',
+    'dumb': 'unclear, confusing, not well thought out',
+    'moron': 'person who may not understand',
+    'fat': 'plus-size, curvy, larger body',
+    'ugly': 'different appearance, unique look',
+    'worthless': 'struggling, going through challenges',
+    'loser': 'person facing difficulties',
+    'failure': 'learning experience, setback',
+    'pathetic': 'unfortunate, challenging',
+    'damn': 'darn, frustrating',
+    'hell': 'difficult situation, tough time',
+    'crap': 'not great, disappointing',
+    'jerk': 'unkind person, difficult person',
+    'bitch': 'difficult person, unkind individual',
+    'ass': 'rude person, difficult individual',
+    'bastard': 'unkind person',
+    'shit': 'not great, disappointing',
+    'fuck': 'frustrating, annoying',
+    'fucking': 'very, extremely'
+};
+
+function checkContent(text) {
+    const textLower = text.toLowerCase();
+    const flaggedWords = [];
+    const suggestions = {};
+    
+    for (const [word, alternative] of Object.entries(inappropriateWords)) {
+        const pattern = new RegExp('\\b' + word + '\\b', 'i');
+        if (pattern.test(textLower)) {
+            flaggedWords.push(word);
+            suggestions[word] = alternative;
+        }
+    }
+    
+    return { flaggedWords, suggestions };
+}
+
+function showWarning(elementId, flaggedWords, suggestions) {
+    const warningDiv = document.getElementById(elementId);
+    
+    if (flaggedWords.length === 0) {
+        warningDiv.classList.add('d-none');
+        return;
+    }
+    
+    let warningHtml = '<strong><i class="bi bi-exclamation-triangle"></i> Inappropriate content detected</strong><br>';
+    warningHtml += '<small>Our community values respectful and supportive language. Please consider these alternatives:</small><br><br>';
+    
+    for (const word of flaggedWords) {
+        warningHtml += `<div class="mt-1">• Instead of "<strong>${word}</strong>", try: <em>${suggestions[word]}</em></div>`;
+    }
+    
+    warningDiv.innerHTML = warningHtml;
+    warningDiv.classList.remove('d-none');
+}
+
+// Real-time content checking
+document.getElementById('postTitle').addEventListener('input', function() {
+    const result = checkContent(this.value);
+    showWarning('titleWarning', result.flaggedWords, result.suggestions);
+});
+
+document.getElementById('postContent').addEventListener('input', function() {
+    const result = checkContent(this.value);
+    showWarning('contentWarning', result.flaggedWords, result.suggestions);
+});
+
+document.getElementById('newPostForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const title = document.getElementById('postTitle').value;
+    const content = document.getElementById('postContent').value;
+    
+    fetch('/forum/category/{{ category.id }}/new', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify({ title: title, content: content })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || 'Failed to create post');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Post created successfully!', 'success');
+            setTimeout(() => window.location.href = '/forum/post/' + data.post_id, 1000);
+        } else {
+            showToast(data.message || 'Failed to create post', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast(error.message || 'Error creating post', 'danger');
+    });
+});
+
+function showToast(message, type = 'success') {
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toast = document.querySelector('.toast:last-child');
+    new bootstrap.Toast(toast).show();
+    setTimeout(() => toast?.remove(), 5000);
+}
+</script>
+{% endblock %}

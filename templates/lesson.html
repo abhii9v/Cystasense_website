@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('learn') }}">Learn</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('track_detail', track_id=track.id) }}">{{ track.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ lesson.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Lesson Header -->
+            <h1 class="mb-3">{{ lesson.title }}</h1>
+            
+            <!-- Why It Matters -->
+            <div class="card mb-4 border-teal">
+                <div class="card-body">
+                    <h5 class="card-title text-teal"><i class="bi bi-lightbulb"></i> Why It Matters</h5>
+                    <p class="card-text">{{ lesson.why_it_matters }}</p>
+                </div>
+            </div>
+
+            <!-- Video -->
+            {% if lesson.video_url %}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-indigo"><i class="bi bi-play-circle-fill"></i> Video Lesson</h5>
+                    <div class="ratio ratio-16x9">
+                        <iframe src="{{ lesson.video_url|youtube_embed }}" 
+                                allowfullscreen
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                loading="lazy"></iframe>
+                    </div>
+                    {% if lesson.video_duration_minutes %}
+                    <p class="text-muted mt-2 mb-0"><small><i class="bi bi-clock"></i> {{ lesson.video_duration_minutes }} minutes</small></p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Lesson Content -->
+            {% if lesson.content %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Lesson Content</h5>
+                    <p class="card-text">{{ lesson.content }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Do's and Don'ts -->
+            {% if dos or donts %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Key Points</h5>
+                    <div class="row">
+                        {% if dos %}
+                        <div class="col-md-6">
+                            <h6 class="text-success"><i class="bi bi-check-circle"></i> Do's</h6>
+                            <ul class="list-unstyled">
+                                {% for do in dos %}
+                                <li class="mb-2"><i class="bi bi-check text-success"></i> {{ do }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        {% if donts %}
+                        <div class="col-md-6">
+                            <h6 class="text-danger"><i class="bi bi-x-circle"></i> Don'ts</h6>
+                            <ul class="list-unstyled">
+                                {% for dont in donts %}
+                                <li class="mb-2"><i class="bi bi-x text-danger"></i> {{ dont }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Items -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-list-check"></i> Action Steps</h5>
+                    <p class="text-muted mb-3">Complete these actions to apply what you've learned:</p>
+                    <div class="list-group list-group-flush">
+                        {% for action in lesson.actions|sort(attribute='order_index') %}
+                        <div class="list-group-item d-flex align-items-start">
+                            <input class="form-check-input me-3 mt-1" type="checkbox" 
+                                   id="action-{{ action.id }}" 
+                                   data-action-id="{{ action.id }}"
+                                   {% if action.id|string in completed_actions %}checked{% endif %}>
+                            <label class="flex-grow-1" for="action-{{ action.id }}">
+                                {{ action.action_text }}
+                                {% if action.is_optional %}
+                                <span class="badge bg-secondary ms-2">Optional</span>
+                                {% endif %}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversation Prompt -->
+            {% if lesson.conversation_prompt %}
+            <div class="card mb-4 border-indigo">
+                <div class="card-body">
+                    <h5 class="card-title text-indigo"><i class="bi bi-chat-dots"></i> Conversation Starter</h5>
+                    <p class="card-text">{{ lesson.conversation_prompt }}</p>
+                    <a href="{{ url_for('forum') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-share"></i> Share on Forum
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quiz Button -->
+            <div class="d-grid gap-2 mb-4">
+                <a href="{{ url_for('lesson_quiz', lesson_id=lesson.id) }}" class="btn btn-teal btn-lg">
+                    <i class="bi bi-question-circle"></i> Take Quiz
+                    {% if progress and progress.quiz_score %}
+                    (Best: {{ progress.quiz_score }}%)
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="card-title">Progress</h5>
+                    
+                    {% if progress %}
+                    {% if progress.completed_at %}
+                    <div class="alert alert-success mb-3">
+                        <i class="bi bi-check-circle"></i> Completed!
+                    </div>
+                    {% elif progress.started_at %}
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-clock"></i> Started {{ progress.started_at.strftime('%b %d, %Y') }}
+                    </p>
+                    {% endif %}
+                    {% endif %}
+
+                    {% if progress and progress.quiz_score %}
+                    <div class="mb-3">
+                        <strong>Quiz Score:</strong>
+                        <div class="progress mt-2" style="height: 25px;">
+                            <div class="progress-bar {% if progress.quiz_score >= 70 %}bg-success{% else %}bg-warning{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ progress.quiz_score }}%;">
+                                {{ progress.quiz_score }}%
+                            </div>
+                        </div>
+                        <small class="text-muted">Attempts: {{ progress.quiz_attempts }}</small>
+                    </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <h6>Navigation</h6>
+                    <a href="{{ url_for('track_detail', track_id=track.id) }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        <i class="bi bi-arrow-left"></i> Back to Track
+                    </a>
+                    <a href="{{ url_for('learn') }}" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="bi bi-grid"></i> All Tracks
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle action completion
+document.querySelectorAll('input[data-action-id]').forEach(checkbox => {
+    checkbox.addEventListener('change', async function() {
+        const actionId = this.dataset.actionId;
+        const lessonId = {{ lesson.id }};
+        
+        if (this.checked) {
+            try {
+                const response = await fetch(`/learn/lesson/${lessonId}/complete-action`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ action_id: actionId })
+                });
+                
+                if (!response.ok) {
+                    this.checked = false;
+                    alert('Failed to save progress');
+                }
+            } catch (error) {
+                this.checked = false;
+                alert('Failed to save progress');
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.border-teal {
+    border-color: #14b8a6 !important;
+}
+.border-indigo {
+    border-color: #6610f2 !important;
+}
+.text-teal {
+    color: #14b8a6 !important;
+}
+.text-indigo {
+    color: #6610f2 !important;
+}
+.btn-teal {
+    background-color: #14b8a6;
+    color: white;
+}
+.btn-teal:hover {
+    background-color: #0f9b8e;
+    color: white;
+}
+.btn-indigo {
+    background-color: #6610f2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+}
+.btn-indigo:hover {
+    background-color: #5a0cd8;
+    color: white;
+}
+.btn-outline-indigo {
+    background-color: transparent;
+    color: #6610f2;
+    border: 2px solid #6610f2;
+    padding: 10px 20px;
+    font-weight: 500;
+}
+.btn-outline-indigo:hover {
+    background-color: #6610f2;
+    color: white;
+    border-color: #6610f2;
+}
+</style>
+{% endblock %}

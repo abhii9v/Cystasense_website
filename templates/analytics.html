@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - PCOD Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-2"><i class="bi bi-bar-chart"></i> Health Analytics</h1>
+    <p class="text-muted mb-4">Track your health. Understand your body. Embrace your progress.</p>
+    
+    {% if symptom_feedback %}
+    <div class="alert alert-{{ symptom_feedback.color }} border-{{ symptom_feedback.color }} shadow-sm mb-4" role="alert">
+        <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+                <h5 class="alert-heading mb-2">
+                    {{ symptom_feedback.emoji }} {{ symptom_feedback.title }}
+                </h5>
+                <p class="mb-0">{{ symptom_feedback.message }}</p>
+            </div>
+            <div class="ms-3">
+                <div class="badge bg-{{ symptom_feedback.color }} fs-4 px-3 py-2">
+                    {{ health_score }}/5
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="row g-4">
+        <!-- Symptom Trends -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-graph-up"></i> Symptom Trends</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="symptomChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cycle Regularity -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-calendar-heart"></i> Cycle Patterns</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="cycleChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary Stats -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-clipboard-data"></i> Health Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-primary">{{ symptoms_data|length }}</h4>
+                                <p class="mb-0">Symptoms Logged</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-success">{{ cycles_data|length }}</h4>
+                                <p class="mb-0">Cycles Tracked</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-info">
+                                    {% set cycle_lengths = cycles_data|map(attribute='cycle_length')|select|list %}
+                                    {% if cycle_lengths|length > 0 %}
+                                        {{ (cycle_lengths|sum / cycle_lengths|length)|round(1) }}d
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </h4>
+                                <p class="mb-0">Avg Cycle Length</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-warning">
+                                    {% if symptoms_data %}
+                                        {{ ((symptoms_data|map(attribute='mood_swings')|select|list|sum or 0) / (symptoms_data|length))|round(1) }}
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </h4>
+                                <p class="mb-0">Avg Mood Score</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Symptom Trends Chart
+    const symptomCtx = document.getElementById('symptomChart').getContext('2d');
+    const symptomChart = new Chart(symptomCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for symptom in symptoms_data[:10] %}
+                    '{{ symptom.date.strftime("%m/%d") }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Acne Severity',
+                data: [
+                    {% for symptom in symptoms_data[:10] %}
+                        {{ symptom.acne_severity or 0 }},
+                    {% endfor %}
+                ],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Fatigue Level',
+                data: [
+                    {% for symptom in symptoms_data[:10] %}
+                        {{ symptom.fatigue_level or 0 }},
+                    {% endfor %}
+                ],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5
+                }
+            }
+        }
+    });
+    
+    // Cycle Chart
+    const cycleCtx = document.getElementById('cycleChart').getContext('2d');
+    const cycleChart = new Chart(cycleCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for cycle in cycles_data[:6] %}
+                    '{{ cycle.start_date.strftime("%m/%d") }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Cycle Length (days)',
+                data: [
+                    {% for cycle in cycles_data[:6] %}
+                        {{ cycle.cycle_length or 0 }},
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

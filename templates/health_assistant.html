@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+
+{% block title %}PCOS Health Assistant - CystaSense{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        max-width: 900px;
+        margin: 0 auto;
+        height: calc(100vh - 200px);
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .chat-header {
+        background: linear-gradient(135deg, #6610f2 0%, #14b8a6 100%);
+        color: white;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .chat-header .avatar {
+        width: 56px;
+        height: 56px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+    
+    .chat-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .chat-header p {
+        margin: 4px 0 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+    
+    .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: #f8f9fa;
+    }
+    
+    .message {
+        max-width: 80%;
+        padding: 14px 18px;
+        border-radius: 18px;
+        line-height: 1.5;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #6610f2, #7c3aed);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message.assistant {
+        align-self: flex-start;
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .message.assistant .source-badge {
+        display: inline-block;
+        background: #e8f5e9;
+        color: #2e7d32;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+    
+    .welcome-message {
+        text-align: center;
+        padding: 40px 20px;
+    }
+    
+    .welcome-message h2 {
+        color: #6610f2;
+        margin-bottom: 12px;
+    }
+    
+    .welcome-message p {
+        color: #666;
+        margin-bottom: 24px;
+    }
+    
+    .suggestions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .suggestion-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 14px 16px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        color: #333;
+    }
+    
+    .suggestion-btn:hover {
+        border-color: #6610f2;
+        background: #f8f5ff;
+        transform: translateY(-2px);
+    }
+    
+    .suggestion-btn i {
+        color: #6610f2;
+        margin-right: 8px;
+    }
+    
+    .chat-input-container {
+        padding: 16px 20px;
+        background: white;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .chat-input-wrapper {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .chat-input {
+        flex: 1;
+        border: 2px solid #e9ecef;
+        border-radius: 24px;
+        padding: 14px 20px;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    
+    .chat-input:focus {
+        border-color: #6610f2;
+    }
+    
+    .send-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6610f2, #14b8a6);
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102, 16, 242, 0.3);
+    }
+    
+    .send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .typing-indicator {
+        display: flex;
+        gap: 4px;
+        padding: 10px 18px;
+        background: white;
+        border-radius: 18px;
+        align-self: flex-start;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        background: #6610f2;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typing {
+        0%, 100% { transform: translateY(0); opacity: 0.4; }
+        50% { transform: translateY(-4px); opacity: 1; }
+    }
+    
+    .clear-chat-btn {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.8);
+        cursor: pointer;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+    
+    .clear-chat-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+    
+    .disclaimer {
+        text-align: center;
+        padding: 12px 20px;
+        background: #fff3cd;
+        color: #856404;
+        font-size: 0.8rem;
+        border-top: 1px solid #ffc107;
+    }
+    
+    .disclaimer i {
+        margin-right: 6px;
+    }
+    
+    @media (max-width: 768px) {
+        .chat-container {
+            height: calc(100vh - 150px);
+            border-radius: 0;
+        }
+        
+        .message {
+            max-width: 90%;
+        }
+        
+        .suggestions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="avatar">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div>
+                <h1>PCOS Health Assistant</h1>
+                <p>Powered by trusted medical sources</p>
+            </div>
+            <button class="clear-chat-btn" onclick="clearChat()">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                New Chat
+            </button>
+        </div>
+        
+        <div class="messages-container" id="messagesContainer">
+            <div class="welcome-message" id="welcomeMessage">
+                <h2>Hello! I'm your PCOS Health Assistant</h2>
+                <p>I can help answer your questions about PCOS/PCOD. My knowledge comes from trusted medical sources including Mayo Clinic, Johns Hopkins, WHO, and more.</p>
+                <p><strong>Try asking me about:</strong></p>
+                <div class="suggestions-grid">
+                    {% for suggestion in suggestions %}
+                    <button class="suggestion-btn" onclick="sendSuggestion('{{ suggestion }}')">
+                        <i class="bi bi-chat-dots"></i>
+                        {{ suggestion }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="disclaimer">
+            <i class="bi bi-info-circle"></i>
+            This assistant provides general information only. Always consult a healthcare provider for medical advice.
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" 
+                       class="chat-input" 
+                       id="chatInput" 
+                       placeholder="Ask me anything about PCOS..." 
+                       onkeypress="handleKeyPress(event)">
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let conversationId = null;
+let isWaiting = false;
+
+// Check URL for conversation ID and load history
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const convId = urlParams.get('conversation_id');
+    
+    if (convId) {
+        loadConversationHistory(convId);
+    }
+});
+
+function loadConversationHistory(convId) {
+    fetch('/api/chat/history/' + encodeURIComponent(convId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.history && data.history.length > 0) {
+                conversationId = data.conversation_id;
+                document.getElementById('welcomeMessage')?.remove();
+                
+                data.history.forEach(msg => {
+                    addMessage(msg.content, msg.role);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading conversation history:', error);
+        });
+}
+
+function sendSuggestion(text) {
+    document.getElementById('chatInput').value = text;
+    sendMessage();
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter' && !isWaiting) {
+        sendMessage();
+    }
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (!message || isWaiting) return;
+    
+    document.getElementById('welcomeMessage')?.remove();
+    
+    addMessage(message, 'user');
+    input.value = '';
+    
+    showTypingIndicator();
+    isWaiting = true;
+    document.getElementById('sendBtn').disabled = true;
+    
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify({
+            message: message,
+            conversation_id: conversationId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideTypingIndicator();
+        isWaiting = false;
+        document.getElementById('sendBtn').disabled = false;
+        
+        if (data.response) {
+            conversationId = data.conversation_id;
+            addMessage(data.response, 'assistant');
+        } else if (data.error) {
+            addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        hideTypingIndicator();
+        isWaiting = false;
+        document.getElementById('sendBtn').disabled = false;
+        addMessage('Sorry, I couldn\'t process your request. Please try again.', 'assistant');
+    });
+}
+
+function formatMarkdown(text) {
+    return text
+        // Headers (must come before other replacements)
+        .replace(/^### (.*?)$/gm, '<h5 class="mt-3 mb-2">$1</h5>')
+        .replace(/^## (.*?)$/gm, '<h4 class="mt-3 mb-2">$1</h4>')
+        .replace(/^# (.*?)$/gm, '<h4 class="mt-3 mb-2">$1</h4>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Bullet points
+        .replace(/^- (.*?)$/gm, '<li style="margin-left: 20px;">$1</li>')
+        .replace(/^\* (.*?)$/gm, '<li style="margin-left: 20px;">$1</li>')
+        // Numbered lists
+        .replace(/^\d+\. (.*?)$/gm, '<li style="margin-left: 20px;">$1</li>')
+        // Line breaks
+        .replace(/\n/g, '<br>');
+}
+
+function addMessage(text, type) {
+    const container = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}`;
+    
+    let formattedText = formatMarkdown(text);
+    
+    messageDiv.innerHTML = formattedText;
+    
+    if (type === 'assistant') {
+        const badge = document.createElement('div');
+        badge.className = 'source-badge';
+        badge.innerHTML = '<i class="bi bi-patch-check-fill"></i> Trusted Medical Sources';
+        messageDiv.appendChild(badge);
+    }
+    
+    container.appendChild(messageDiv);
+    
+    // Scroll to show the beginning of the new message, not the end
+    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showTypingIndicator() {
+    const container = document.getElementById('messagesContainer');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'typing-indicator';
+    typingDiv.id = 'typingIndicator';
+    typingDiv.innerHTML = '<span></span><span></span><span></span>';
+    container.appendChild(typingDiv);
+    typingDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function hideTypingIndicator() {
+    document.getElementById('typingIndicator')?.remove();
+}
+
+function clearChat() {
+    if (conversationId) {
+        fetch('/api/chat/clear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify({ conversation_id: conversationId })
+        });
+    }
+    
+    conversationId = null;
+    const container = document.getElementById('messagesContainer');
+    container.innerHTML = `
+        <div class="welcome-message" id="welcomeMessage">
+            <h2>Hello! I'm your PCOS Health Assistant</h2>
+            <p>I can help answer your questions about PCOS/PCOD. My knowledge comes from trusted medical sources including Mayo Clinic, Johns Hopkins, WHO, and more.</p>
+            <p><strong>Try asking me about:</strong></p>
+            <div class="suggestions-grid">
+                {% for suggestion in suggestions %}
+                <button class="suggestion-btn" onclick="sendSuggestion('{{ suggestion }}')">
+                    <i class="bi bi-chat-dots"></i>
+                    {{ suggestion }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+    `;
+}
+
+document.getElementById('chatInput').focus();
+</script>
+{% endblock %}

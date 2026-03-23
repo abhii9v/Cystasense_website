@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - PCOD Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4"><i class="bi bi-person"></i> Your Profile</h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h4>Personal Information</h4>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" value="{{ user.first_name or '' }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" value="{{ user.last_name or '' }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ user.email or '' }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" value="{{ user.age or '' }}" min="18" max="100">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Height (cm)</label>
+                                <input type="number" class="form-control" id="height" value="{{ user.height or '' }}" min="100" max="250" step="0.1">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Weight (kg)</label>
+                                <input type="number" class="form-control" id="weight" value="{{ user.weight or '' }}" min="30" max="200" step="0.1">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Number</label>
+                                <input type="tel" class="form-control" id="contactNumber" value="{{ user.contact_number or '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact</label>
+                                <input type="tel" class="form-control" id="emergencyContact" value="{{ user.emergency_contact or '' }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Medical History</label>
+                                <textarea class="form-control" id="medicalHistory" rows="4" placeholder="Previous medical conditions, surgeries, medications...">{{ user.medical_history or '' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Health Metrics -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Health Metrics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h5 class="text-primary">
+                                    {% if user.height and user.weight %}
+                                        {{ ((user.weight / ((user.height/100) ** 2)) | round(1)) }}
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </h5>
+                                <p class="mb-0">BMI</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h5 class="text-success">{{ user.age or '--' }}</h5>
+                                <p class="mb-0">Age</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h5 class="text-info">{{ user.created_at.strftime('%Y') if user.created_at else '--' }}</h5>
+                                <p class="mb-0">Member Since</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h5 class="text-warning">Active</h5>
+                                <p class="mb-0">Status</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Reminders -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4><i class="bi bi-bell"></i> Daily Reminders</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <p class="mb-2">
+                                {% if user.reminder_enabled %}
+                                    <i class="bi bi-check-circle-fill text-success"></i> 
+                                    Reminders are <strong>enabled</strong> for {{ user.reminder_time }} ({{ user.reminder_timezone }})
+                                {% else %}
+                                    <i class="bi bi-x-circle text-muted"></i> 
+                                    Daily reminders are currently <strong>disabled</strong>
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">Get daily check-in reminders with positive motivational messages</small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{{ url_for('reminder_settings') }}" class="btn btn-primary">
+                                <i class="bi bi-gear"></i> Manage Reminders
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Role Switcher -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4><i class="bi bi-person-badge"></i> Account Role</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Current Role:</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if user.user_role == 'pcos_user' %}
+                                        <span class="badge bg-primary fs-6 px-3 py-2">
+                                            <i class="bi bi-heart-pulse"></i> PCOS User
+                                        </span>
+                                        <span class="text-muted">You can track symptoms, cycles, and manage your health</span>
+                                    {% elif user.user_role == 'family_member' %}
+                                        <span class="badge bg-info fs-6 px-3 py-2">
+                                            <i class="bi bi-people"></i> Family Supporter
+                                        </span>
+                                        <span class="text-muted">You can help and support someone with PCOS</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-info-circle"></i> 
+                                Switch your role to access different features. Your data will be preserved when you switch back.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#roleSwitchModal">
+                                <i class="bi bi-arrow-left-right"></i> Switch Role
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role Switch Confirmation Modal -->
+<div class="modal fade" id="roleSwitchModal" tabindex="-1" aria-labelledby="roleSwitchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roleSwitchModalLabel">
+                    <i class="bi bi-arrow-left-right"></i> Switch Account Role
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if user.user_role == 'pcos_user' %}
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="bi bi-people"></i> Switch to Family Supporter?</h6>
+                        <p class="mb-2">You will be able to:</p>
+                        <ul class="mb-2">
+                            <li>Connect with PCOS users to support them</li>
+                            <li>View their health data (with permission)</li>
+                            <li>Send motivation and encouragement</li>
+                        </ul>
+                        <p class="mb-0"><strong>Note:</strong> Your symptom tracking data will be preserved but hidden until you switch back.</p>
+                    </div>
+                {% elif user.user_role == 'family_member' %}
+                    <div class="alert alert-primary">
+                        <h6 class="alert-heading"><i class="bi bi-heart-pulse"></i> Switch to PCOS User?</h6>
+                        <p class="mb-2">You will be able to:</p>
+                        <ul class="mb-2">
+                            <li>Track your symptoms and menstrual cycles</li>
+                            <li>Monitor your health analytics</li>
+                            <li>Access diet and exercise plans</li>
+                        </ul>
+                        <p class="mb-0"><strong>Note:</strong> Your supporter connections will be ended when you switch.</p>
+                    </div>
+                {% endif %}
+                <p class="text-center fw-bold mb-0">Are you sure you want to switch your role?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmRoleSwitch">
+                    <i class="bi bi-check-circle"></i> Yes, Switch Role
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const data = {
+        age: parseInt(document.getElementById('age').value) || null,
+        height: parseFloat(document.getElementById('height').value) || null,
+        weight: parseFloat(document.getElementById('weight').value) || null,
+        contact_number: document.getElementById('contactNumber').value || null,
+        emergency_contact: document.getElementById('emergencyContact').value || null,
+        medical_history: document.getElementById('medicalHistory').value || null
+    };
+    
+    fetch('/profile/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Profile updated successfully!');
+            location.reload();
+        } else {
+            alert('Error updating profile: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error updating your profile.');
+    });
+});
+
+// Role switcher
+document.getElementById('confirmRoleSwitch').addEventListener('click', function() {
+    const button = this;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Switching...';
+    
+    fetch('/profile/switch-role', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.href = data.redirect_url || '/dashboard';
+        } else {
+            alert('Error switching role: ' + data.message);
+            button.disabled = false;
+            button.innerHTML = '<i class="bi bi-check-circle"></i> Yes, Switch Role';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error switching your role.');
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-check-circle"></i> Yes, Switch Role';
+    });
+});
+</script>
+{% endblock %}

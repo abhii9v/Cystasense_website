@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+
+{% block title %}CheerUp Buddy - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; padding: 2rem 0;">
+    <div class="container">
+        <!-- Professional Header -->
+        <div class="text-center mb-5">
+            <div class="d-inline-block p-3 rounded-circle mb-3" style="background: linear-gradient(135deg, #6610f2, #14b8a6);">
+                <i class="bi bi-people-fill text-white" style="font-size: 2.5rem;"></i>
+            </div>
+            <h1 class="display-5 fw-bold mb-2" style="color: #1a1a2e;">CheerUp Buddy</h1>
+            <p class="lead text-muted mb-0">Because every cheer counts.</p>
+        </div>
+
+        <!-- Stats Overview -->
+        {% if connection_data|length > 0 %}
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 60px; height: 60px; background: rgba(102, 16, 242, 0.1);">
+                            <i class="bi bi-people text-indigo" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h2 class="display-6 fw-bold mb-1">{{ connection_data|length }}</h2>
+                        <p class="text-muted mb-0">Active Connection{{ 's' if connection_data|length != 1 else '' }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 60px; height: 60px; background: rgba(20, 184, 166, 0.1);">
+                            <i class="bi bi-chat-heart text-teal" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h2 class="display-6 fw-bold mb-1">
+                            {{ connection_data|selectattr('connection.can_send_nudges')|list|length }}
+                        </h2>
+                        <p class="text-muted mb-0">Messaging Enabled</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 60px; height: 60px; background: rgba(255, 193, 7, 0.1);">
+                            <i class="bi bi-heart-pulse" style="font-size: 1.8rem; color: #ffc107;"></i>
+                        </div>
+                        <h2 class="display-6 fw-bold mb-1">
+                            {{ connection_data|selectattr('connection.can_view_symptoms')|list|length }}
+                        </h2>
+                        <p class="text-muted mb-0">Health Access</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- New Connection Request Section -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 text-center mb-3 mb-lg-0">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" 
+                             style="width: 80px; height: 80px; background: linear-gradient(135deg, #6610f2, #14b8a6);">
+                            <i class="bi bi-plus-circle text-white" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5 class="mb-0 fw-bold">New Connection</h5>
+                    </div>
+                    <div class="col-lg-9">
+                        <p class="text-muted mb-3">Enter the email address of someone with PCOS you'd like to support. They will receive your request and can choose to accept.</p>
+                        <form id="requestConnectionForm" class="row g-2">
+                            <div class="col-md-8">
+                                <input type="email" class="form-control form-control-lg" id="requestEmail" 
+                                       placeholder="example@email.com" required>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-lg w-100" style="background: linear-gradient(135deg, #6610f2, #14b8a6); color: white;">
+                                    <i class="bi bi-send-fill me-2"></i>Send Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Connections Section -->
+        <div class="mb-4">
+            <h3 class="fw-bold mb-4">Your Connections</h3>
+            
+            {% if connection_data|length > 0 %}
+            <div class="row g-4">
+                {% for data in connection_data %}
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm h-100 hover-lift">
+                        <!-- Card Header with Gradient -->
+                        <div class="card-header border-0 p-4" style="background: linear-gradient(135deg, #6610f2, #14b8a6);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rounded-circle bg-white d-inline-flex align-items-center justify-content-center me-3" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="bi bi-person-fill" style="font-size: 1.5rem; color: #6610f2;"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-0 text-white fw-bold">{{ data.user.full_name }}</h5>
+                                            <small class="text-white opacity-75">{{ data.user.email }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-white text-dark px-3 py-2">
+                                    <i class="bi bi-check-circle-fill text-success"></i> Active
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <!-- Goals Section -->
+                            {% if data.connection.can_view_goals %}
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-2" 
+                                         style="width: 32px; height: 32px; background: rgba(102, 16, 242, 0.1);">
+                                        <i class="bi bi-bullseye text-indigo"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-bold">Current Goals</h6>
+                                </div>
+                                {% if data.goals|length > 0 %}
+                                <div class="ps-4">
+                                    {% for goal in data.goals[:3] %}
+                                    <div class="d-flex align-items-start mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                                        <span class="text-muted">{{ goal }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <p class="text-muted small ps-4 mb-0">No goals set yet</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Symptoms Section -->
+                            {% if data.connection.can_view_symptoms %}
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-2" 
+                                         style="width: 32px; height: 32px; background: rgba(20, 184, 166, 0.1);">
+                                        <i class="bi bi-activity text-teal"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-bold">Recent Activity (7 Days)</h6>
+                                </div>
+                                {% if data.symptoms|length > 0 %}
+                                <div class="ps-4">
+                                    {% for symptom in data.symptoms[:3] %}
+                                    <span class="badge rounded-pill bg-light text-dark border me-2 mb-2 px-3 py-2">
+                                        {{ symptom.symptom_type|title }}
+                                        {% if symptom.severity %}
+                                        <span class="badge rounded-pill ms-1 {{ 'bg-danger' if symptom.severity == 'severe' else 'bg-warning' if symptom.severity == 'moderate' else 'bg-info' }}">
+                                            {{ symptom.severity }}
+                                        </span>
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <p class="text-muted small ps-4 mb-0">No recent symptoms logged</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Permissions -->
+                            <div class="border-top pt-3">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <div>
+                                        <small class="text-muted d-block mb-2">Your Permissions:</small>
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            {% if data.connection.can_view_goals %}
+                                            <span class="badge bg-primary-subtle text-primary border border-primary">
+                                                <i class="bi bi-bullseye"></i> Goals
+                                            </span>
+                                            {% endif %}
+                                            {% if data.connection.can_view_symptoms %}
+                                            <span class="badge bg-success-subtle text-success border border-success">
+                                                <i class="bi bi-activity"></i> Symptoms
+                                            </span>
+                                            {% endif %}
+                                            {% if data.connection.can_send_nudges %}
+                                            <span class="badge bg-info-subtle text-info border border-info">
+                                                <i class="bi bi-chat-heart"></i> Messages
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="card-footer bg-transparent border-top-0 p-4 pt-0">
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('view_user_dashboard', connection_id=data.connection.id) }}" 
+                                   class="btn btn-indigo btn-lg">
+                                    <i class="bi bi-speedometer2 me-2"></i>View Full Dashboard
+                                </a>
+                                {% if data.connection.can_send_nudges %}
+                                <button class="btn btn-outline-teal btn-lg" 
+                                        onclick="openMessageModal({{ data.connection.id }}, '{{ data.user.first_name }}')">
+                                    <i class="bi bi-chat-heart me-2"></i>Send Encouragement
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% else %}
+            <!-- Empty State -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-5">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-4" 
+                         style="width: 100px; height: 100px; background: rgba(102, 16, 242, 0.1);">
+                        <i class="bi bi-people" style="font-size: 3rem; color: #6610f2;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">No Active Connections</h4>
+                    <p class="text-muted mb-4">You're not supporting anyone yet. Use the connection request form above to send an invitation to someone with PCOS.</p>
+                    <div class="d-inline-flex gap-3">
+                        <div class="text-start">
+                            <i class="bi bi-1-circle-fill text-indigo me-2"></i>
+                            <span class="text-muted">Enter their email</span>
+                        </div>
+                        <div class="text-start">
+                            <i class="bi bi-2-circle-fill text-indigo me-2"></i>
+                            <span class="text-muted">They accept</span>
+                        </div>
+                        <div class="text-start">
+                            <i class="bi bi-3-circle-fill text-indigo me-2"></i>
+                            <span class="text-muted">Start supporting!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, #6610f2, #14b8a6);">
+                <h5 class="modal-title text-white fw-bold">
+                    <i class="bi bi-chat-heart me-2"></i>Send Motivational Message
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="messageConnectionId">
+                <div class="alert alert-light border mb-4">
+                    <i class="bi bi-info-circle text-indigo me-2"></i>
+                    Sending an encouraging message to <strong id="recipientName"></strong>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Message Type</label>
+                    <select class="form-select form-select-lg" id="messageType">
+                        <option value="encouragement">💪 Encouragement</option>
+                        <option value="reminder">🔔 Gentle Reminder</option>
+                        <option value="celebration">🎉 Celebration</option>
+                        <option value="question">❓ Question</option>
+                        <option value="other">💬 Other</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Your Message</label>
+                    <textarea class="form-control" id="messageText" rows="5" maxlength="500" 
+                              placeholder="Write your encouraging message here..." style="resize: none;"></textarea>
+                    <div class="d-flex justify-content-between mt-2">
+                        <small class="text-muted">Maximum 500 characters</small>
+                        <small class="fw-bold"><span id="charCount">0</span>/500</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light btn-lg px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-lg px-4" onclick="sendMessage()" 
+                        style="background: linear-gradient(135deg, #6610f2, #14b8a6); color: white;">
+                    <i class="bi bi-send-fill me-2"></i>Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Request connection form handler
+document.getElementById('requestConnectionForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('requestEmail').value;
+    const btn = this.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+    
+    try {
+        const response = await fetch('/family/request-connection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ email: email })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('Connection request sent successfully! They will be notified.');
+            document.getElementById('requestEmail').value = '';
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Failed to send connection request');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+});
+
+function openMessageModal(connectionId, recipientName) {
+    document.getElementById('messageConnectionId').value = connectionId;
+    document.getElementById('recipientName').textContent = recipientName;
+    document.getElementById('messageText').value = '';
+    document.getElementById('charCount').textContent = '0';
+    new bootstrap.Modal(document.getElementById('messageModal')).show();
+}
+
+document.getElementById('messageText')?.addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length;
+});
+
+async function sendMessage() {
+    const connectionId = document.getElementById('messageConnectionId').value;
+    const messageType = document.getElementById('messageType').value;
+    const messageText = document.getElementById('messageText').value.trim();
+    
+    if (!messageText) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/family/send-nudge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                connection_id: connectionId,
+                message: messageText,
+                nudge_type: messageType
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('Message sent successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('messageModal')).hide();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Failed to send message');
+    }
+}
+</script>
+
+<style>
+.text-indigo { color: #6610f2 !important; }
+.btn-indigo { 
+    background-color: #6610f2; 
+    color: white; 
+    border: none;
+}
+.btn-indigo:hover { 
+    background-color: #5208d4; 
+    color: white; 
+}
+.text-teal { color: #14b8a6 !important; }
+.bg-teal { background-color: #14b8a6 !important; }
+.btn-teal { 
+    background-color: #14b8a6; 
+    color: white; 
+    border: none;
+}
+.btn-teal:hover { 
+    background-color: #0f9b8e; 
+    color: white; 
+}
+.btn-outline-teal {
+    border: 2px solid #14b8a6;
+    color: #14b8a6;
+    background: transparent;
+}
+.btn-outline-teal:hover {
+    background-color: #14b8a6;
+    color: white;
+}
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15) !important;
+}
+</style>
+{% endblock %}

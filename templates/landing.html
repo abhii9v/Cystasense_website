@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}CystaSense - Comprehensive Women's Health Management{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Welcome to CystaSense. Learn from your body and embrace balance.</h1>
+                <p class="lead mb-4">
+                    Comprehensive platform for PCOD/PCOS management with symptom tracking, 
+                    educational resources, diet planning, and access to verified specialists.
+                </p>
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-4 me-md-2">
+                        <i class="bi bi-person-plus"></i> Get Started Free
+                    </a>
+                    <a href="{{ url_for('awareness') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-book"></i> Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="bi bi-heart-pulse display-1 text-white opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <h2 class="fw-bold text-primary">1 in 10</h2>
+                    <p class="text-muted">Women affected by PCOD worldwide</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <h2 class="fw-bold text-primary">80%</h2>
+                    <p class="text-muted">Improvement with proper management</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <h2 class="fw-bold text-primary">24/7</h2>
+                    <p class="text-muted">Access to your health data</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <h2 class="fw-bold text-primary">100%</h2>
+                    <p class="text-muted">Privacy and security guaranteed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        
+        <div class="row g-4">
+            <!-- Awareness Module -->
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-book text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Education & Awareness</h5>
+                        <p class="card-text">
+                            Access evidence-based articles, FAQs, lifestyle tips, and self-assessment quizzes 
+                            to understand PCOD better and make informed decisions.
+                        </p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="bi bi-check-circle text-success"></i> Educational resources</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Interactive quizzes</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Lifestyle tips</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Learn Along Your Path</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Self-Management Module -->
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-graph-up text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Smart Tracking & Analytics</h5>
+                        <p class="card-text">
+                            Track symptoms, menstrual cycles, diet, exercise, and get personalized 
+                            insights with advanced analytics and helpful reminders.
+                        </p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="bi bi-check-circle text-success"></i> Symptom tracking</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Cycle monitoring</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Diet & exercise planning</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Smart reminders</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Secure Communications Module -->
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-chat-dots text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Secure Communications</h5>
+                        <p class="card-text">
+                            Our researchers and clinicians have investigated PCOS intensively. In our discussion forum, speak to other women, our researchers and clinicians about the topics that matter to you.
+                        </p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="bi bi-check-circle text-success"></i> Community forum</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Secure connections</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Verified specialists</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Ready to Take Control of Your Health?</h2>
+                <p class="lead mb-4">
+                    Join thousands of women who are successfully managing their PCOD with our comprehensive platform.
+                </p>
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-5">
+                    <i class="bi bi-arrow-right-circle"></i> Start Your Journey Today
+                </a>
+                <p class="mt-3 text-muted">
+                    <small><i class="bi bi-shield-check"></i> HIPAA Compliant • Secure • Free to Start</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-3">Tell Us About Yourself</h2>
+                <p class="text-muted">This helps us personalize your experience and provide better recommendations.</p>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted">Step 3 of 4</small>
+            </div>
+
+            <form id="profileForm">
+                {% if role == 'pcos_user' %}
+                <!-- PCOS User Profile -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-person-badge me-2"></i>Basic Information</h5>
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" name="age" min="13" max="100" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-bullseye me-2"></i>Your Goals (Select all that apply)</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="goals" value="symptom_control" id="goal1">
+                            <label class="form-check-label" for="goal1">Symptom Control</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="goals" value="fertility" id="goal2">
+                            <label class="form-check-label" for="goal2">Fertility & Pregnancy Planning</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="goals" value="weight" id="goal3">
+                            <label class="form-check-label" for="goal3">Weight Management</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="goals" value="mood" id="goal4">
+                            <label class="form-check-label" for="goal4">Mood & Mental Health</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-calendar-heart me-2"></i>Menstrual Status</h5>
+                        <select class="form-select" name="menstrual_status" required>
+                            <option value="">Select status...</option>
+                            <option value="regular">Regular cycles</option>
+                            <option value="irregular">Irregular cycles</option>
+                            <option value="absent">Absent periods</option>
+                            <option value="not_tracking">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-capsule me-2"></i>Current Medications</h5>
+                        <textarea class="form-control" name="current_medications" rows="3" placeholder="List any medications you're currently taking for PCOS or other conditions (optional)"></textarea>
+                        <small class="text-muted">This information helps provide relevant recommendations.</small>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i>Constraints & Preferences</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Time Availability</label>
+                            <input type="text" class="form-control" name="time_constraints" placeholder="e.g., 30 mins/day for exercise">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Equipment Access</label>
+                            <input type="text" class="form-control" name="equipment_constraints" placeholder="e.g., No gym access, home workouts only">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dietary/Cultural Preferences</label>
+                            <input type="text" class="form-control" name="culture_diet_constraints" placeholder="e.g., Vegetarian, no dairy, halal">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-smartwatch me-2"></i>Devices Available (Optional)</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="devices" value="fitness_tracker" id="dev1">
+                            <label class="form-check-label" for="dev1">Fitness Tracker (Fitbit, Garmin, etc.)</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="devices" value="smart_scale" id="dev2">
+                            <label class="form-check-label" for="dev2">Smart Scale</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="devices" value="blood_glucose" id="dev3">
+                            <label class="form-check-label" for="dev3">Blood Glucose Monitor</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="devices" value="apple_health" id="dev4">
+                            <label class="form-check-label" for="dev4">Apple Health / Google Fit</label>
+                        </div>
+                    </div>
+                </div>
+
+                {% else %}
+                <!-- Family Member Profile -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-people me-2"></i>Relationship</h5>
+                        <select class="form-select" name="family_relation" required>
+                            <option value="">Select your relationship...</option>
+                            <option value="parent">Parent</option>
+                            <option value="sibling">Sibling</option>
+                            <option value="spouse">Spouse</option>
+                            <option value="partner">Partner</option>
+                            <option value="child">Child</option>
+                            <option value="friend">Close Friend</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="bi bi-hand-thumbs-up me-2"></i>How would you like to help? (Select all that apply)</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="involvement" value="learn" id="inv1">
+                            <label class="form-check-label" for="inv1">Learn about PCOS to better understand</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="involvement" value="coach" id="inv2">
+                            <label class="form-check-label" for="inv2">Coach and provide emotional support</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="involvement" value="plan_meals" id="inv3">
+                            <label class="form-check-label" for="inv3">Help with meal planning and cooking</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="involvement" value="encourage_activity" id="inv4">
+                            <label class="form-check-label" for="inv4">Encourage physical activity together</label>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('onboarding_consent') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        Continue <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+        if (key === 'goals' || key === 'devices' || key === 'involvement') {
+            if (!data[key]) data[key] = [];
+            data[key].push(value);
+        } else {
+            data[key] = value;
+        }
+    }
+    
+    fetch('{{ url_for("onboarding_profile") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.href = data.next;
+        }
+    });
+});
+</script>
+{% endblock %}

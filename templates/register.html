@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Register - PCOD Care{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card mt-5">
+                <div class="card-header text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-plus text-primary"></i>
+                        Join CystaSense
+                    </h4>
+                    <p class="text-muted small mb-0">For PCOS users and family supporters</p>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> <strong>After registration,</strong> you'll choose your role:
+                        <ul class="mb-0 mt-2">
+                            <li><strong>I have PCOS</strong> - Get personalized health tracking and support</li>
+                            <li><strong>I'm a Family Member</strong> - Learn how to support your loved one</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('register') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('password', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">At least 6 characters</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirm_password', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
+                                <label class="form-check-label" for="agree_terms">
+                                    I agree to the privacy policy and terms of service
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-person-plus"></i> Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Already have an account? 
+                            <a href="{{ url_for('login') }}" class="text-primary">Login here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePasswordVisibility(inputId, button) {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block title %}Family Connections - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="bi bi-people text-indigo"></i> Family Connections</h1>
+
+    {% if current_user.user_role == 'pcos_user' %}
+    
+    <!-- Pending Request Notification -->
+    {% set pending_count = connections_as_primary|selectattr('connection_status', 'equalto', 'pending')|list|length %}
+    {% if pending_count > 0 %}
+    <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center" role="alert">
+        <i class="bi bi-bell-fill fs-4 me-3"></i>
+        <div>
+            <strong>New Connection Request{{ 's' if pending_count > 1 else '' }}!</strong>
+            <p class="mb-0">You have {{ pending_count }} pending connection request{{ 's' if pending_count > 1 else '' }}. Review and activate below.</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+    
+    <!-- PCOS User View: Invite & Manage Supporters -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-teal text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Invite Your Buddy</h5>
+                </div>
+                <div class="card-body">
+                    <p>Invite a family member or friend to support your PCOS journey. You control what they can see and do.</p>
+                    <form id="inviteForm" class="row g-3">
+                        <div class="col-md-8">
+                            <input type="email" class="form-control" id="inviteEmail" 
+                                   placeholder="Enter their email address" required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-teal w-100">
+                                <i class="bi bi-send"></i> Send Invite
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <h4 class="mb-3">Your Connections</h4>
+            {% if connections_as_primary|length > 0 %}
+            <div class="list-group">
+                {% for conn in connections_as_primary %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">{{ conn.family_member.full_name }}</h6>
+                            <p class="mb-1 text-muted">{{ conn.family_member.email }}</p>
+                            <small class="text-muted">
+                                Status: 
+                                {% if conn.connection_status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                                {% elif conn.connection_status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ conn.connection_status|title }}</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                        <div>
+                            {% if conn.connection_status == 'pending' %}
+                            <button class="btn btn-sm btn-primary" 
+                                    onclick="activateConnection({{ conn.id }})">
+                                Activate
+                            </button>
+                            {% elif conn.connection_status == 'active' %}
+                            <button class="btn btn-sm btn-outline-secondary" 
+                                    onclick="managePermissions({{ conn.id }})">
+                                Manage
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if conn.is_active %}
+                    <div class="mt-2">
+                        <small>
+                            Permissions: 
+                            {% if conn.can_view_goals %}<span class="badge bg-info">Goals</span>{% endif %}
+                            {% if conn.can_view_symptoms %}<span class="badge bg-info">Symptoms</span>{% endif %}
+                            {% if conn.can_send_nudges %}<span class="badge bg-info">Nudges</span>{% endif %}
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> You haven't invited any supporters yet. Use the form above to get started!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if current_user.user_role == 'family_member' %}
+    <!-- Family Member View: Connections You Support -->
+    <div class="row">
+        <div class="col-lg-8">
+            <h4 class="mb-2">CheerUp Buddy</h4>
+            <p class="text-muted mb-3"><em>Because every cheer counts.</em></p>
+            {% if connections_as_member|length > 0 %}
+            <div class="list-group">
+                {% for conn in connections_as_member %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <div>
+                            <h6 class="mb-1">{{ conn.primary_user.full_name }}</h6>
+                            <p class="mb-1 text-muted">
+                                {% if conn.connection_status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                                Connected {{ conn.activated_at.strftime('%b %d, %Y') if conn.activated_at else 'recently' }}
+                                {% elif conn.connection_status == 'pending' %}
+                                <span class="badge bg-warning">Pending Approval</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% if conn.is_active %}
+                        <div class="btn-group">
+                            <a href="{{ url_for('view_user_dashboard', connection_id=conn.id) }}" class="btn btn-sm btn-indigo">
+                                <i class="bi bi-speedometer2"></i> View Dashboard
+                            </a>
+                            {% if conn.can_send_nudges %}
+                            <button class="btn btn-sm btn-teal" onclick="openMessageModal({{ conn.id }}, '{{ conn.primary_user.first_name }}')">
+                                <i class="bi bi-chat-heart"></i> Send Message
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> You're not supporting anyone yet. Wait for an invitation from someone with PCOS.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Permission Modal -->
+<div class="modal fade" id="permissionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set Permissions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="permissionForm">
+                    <input type="hidden" id="connectionId">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="canViewGoals">
+                        <label class="form-check-label" for="canViewGoals">
+                            Can view my goals
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="canViewSymptoms">
+                        <label class="form-check-label" for="canViewSymptoms">
+                            Can view my symptoms
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="canSendNudges" checked>
+                        <label class="form-check-label" for="canSendNudges">
+                            Can send me encouraging nudges
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePermissions()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-teal text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-chat-heart"></i> Send Motivational Message
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="messageConnectionId">
+                <p class="mb-3">Send an encouraging message to <strong id="recipientName"></strong></p>
+                
+                <div class="mb-3">
+                    <label class="form-label">Message Type</label>
+                    <select class="form-select" id="messageType">
+                        <option value="encouragement">Encouragement</option>
+                        <option value="reminder">Gentle Reminder</option>
+                        <option value="celebration">Celebration</option>
+                        <option value="question">Question</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Your Message (max 500 characters)</label>
+                    <textarea class="form-control" id="messageText" rows="4" maxlength="500" placeholder="Write your encouraging message here..."></textarea>
+                    <small class="text-muted"><span id="charCount">0</span>/500 characters</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-teal" onclick="sendMessage()">
+                    <i class="bi bi-send"></i> Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('inviteForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('inviteEmail').value;
+    
+    try {
+        const response = await fetch('/family/invite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ email: email })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('Invitation sent successfully!');
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Failed to send invitation');
+    }
+});
+
+function activateConnection(connectionId) {
+    document.getElementById('connectionId').value = connectionId;
+    new bootstrap.Modal(document.getElementById('permissionModal')).show();
+}
+
+function managePermissions(connectionId) {
+    document.getElementById('connectionId').value = connectionId;
+    new bootstrap.Modal(document.getElementById('permissionModal')).show();
+}
+
+async function savePermissions() {
+    const connectionId = document.getElementById('connectionId').value;
+    const permissions = {
+        can_view_goals: document.getElementById('canViewGoals').checked,
+        can_view_symptoms: document.getElementById('canViewSymptoms').checked,
+        can_send_nudges: document.getElementById('canSendNudges').checked
+    };
+    
+    try {
+        const response = await fetch(`/family/connection/${connectionId}/activate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify(permissions)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('Connection activated successfully!');
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Failed to update permissions');
+    }
+}
+
+function openMessageModal(connectionId, recipientName) {
+    document.getElementById('messageConnectionId').value = connectionId;
+    document.getElementById('recipientName').textContent = recipientName;
+    document.getElementById('messageText').value = '';
+    document.getElementById('charCount').textContent = '0';
+    new bootstrap.Modal(document.getElementById('messageModal')).show();
+}
+
+document.getElementById('messageText')?.addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length;
+});
+
+async function sendMessage() {
+    const connectionId = document.getElementById('messageConnectionId').value;
+    const messageType = document.getElementById('messageType').value;
+    const messageText = document.getElementById('messageText').value.trim();
+    
+    if (!messageText) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/family/send-nudge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                connection_id: connectionId,
+                message: messageText,
+                nudge_type: messageType
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('Message sent successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('messageModal')).hide();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Failed to send message');
+    }
+}
+</script>
+
+<style>
+.text-indigo { color: #6610f2 !important; }
+.btn-indigo { background-color: #6610f2; color: white; }
+.btn-indigo:hover { background-color: #5208d4; color: white; }
+.bg-teal { background-color: #14b8a6 !important; }
+.btn-teal { background-color: #14b8a6; color: white; }
+.btn-teal:hover { background-color: #0f9b8e; color: white; }
+</style>
+{% endblock %}

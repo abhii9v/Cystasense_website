@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Find PCOD Specialists - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-4">
+                <i class="bi bi-people" style="font-size: 4rem; color: var(--primary-color);"></i>
+                <h1 class="mt-3">Find PCOD Specialists</h1>
+                <p class="text-muted">Connect with verified healthcare professionals specializing in PCOD/PCOS care</p>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <h4 class="mb-3">Looking for a PCOD Specialist?</h4>
+                    <p class="text-muted mb-4">Find experienced doctors, gynecologists, endocrinologists, and nutritionists who specialize in PCOD treatment.</p>
+                    
+                    <a href="https://www.practo.com/search/doctors?results_type=doctor&q=%5B%7B%22word%22%3A%22pcod%22%2C%22autocompleted%22%3Atrue%2C%22category%22%3A%22symptom%22%7D%5D&city=Bangalore" 
+                       target="_blank" 
+                       class="btn btn-lg px-5"
+                       style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; border: none;">
+                        <i class="bi bi-search"></i> Search for PCOD Specialists
+                    </a>
+                    
+                    <p class="text-muted mt-4 mb-0">
+                        <small>
+                            <i class="bi bi-info-circle"></i> 
+                            Find doctors in your area, check reviews, and book appointments online
+                        </small>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-hospital" style="font-size: 2.5rem; color: var(--accent-color);"></i>
+                            <h5 class="mt-3">Gynecologists</h5>
+                            <p class="text-muted small">Specialized in PCOD diagnosis and treatment</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-heart-pulse" style="font-size: 2.5rem; color: var(--accent-color);"></i>
+                            <h5 class="mt-3">Endocrinologists</h5>
+                            <p class="text-muted small">Experts in hormonal imbalance management</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-apple" style="font-size: 2.5rem; color: var(--accent-color);"></i>
+                            <h5 class="mt-3">Nutritionists</h5>
+                            <p class="text-muted small">PCOD diet and lifestyle specialists</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-color: #6610f2;
+    --accent-color: #14b8a6;
+}
+</style>
+{% endblock %}

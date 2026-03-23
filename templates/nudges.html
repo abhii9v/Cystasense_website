@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="mb-2">
+            <i class="bi bi-chat-heart text-teal"></i> Your Messages
+        </h1>
+        <p class="text-muted">Encouraging messages from your CheerUp Buddies</p>
+    </div>
+
+    {% if nudges %}
+    <div class="row g-4">
+        {% for nudge in nudges %}
+        <div class="col-12">
+            <div class="card shadow-sm border-0 {% if not nudge.is_read %}border-start border-teal border-4{% endif %}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-3" style="width: 50px; height: 50px;">
+                                <i class="bi bi-person-heart" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">{{ nudge.sender.first_name }} {{ nudge.sender.last_name }}</h5>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i> {{ nudge.sent_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                </small>
+                            </div>
+                        </div>
+                        <span class="badge bg-{{ 'success' if nudge.nudge_type == 'encouragement' else 'info' if nudge.nudge_type == 'reminder' else 'warning' if nudge.nudge_type == 'celebration' else 'secondary' }}">
+                            {% if nudge.nudge_type == 'encouragement' %}
+                                <i class="bi bi-heart"></i> Encouragement
+                            {% elif nudge.nudge_type == 'reminder' %}
+                                <i class="bi bi-bell"></i> Reminder
+                            {% elif nudge.nudge_type == 'celebration' %}
+                                <i class="bi bi-trophy"></i> Celebration
+                            {% elif nudge.nudge_type == 'question' %}
+                                <i class="bi bi-question-circle"></i> Question
+                            {% else %}
+                                <i class="bi bi-chat"></i> Message
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="message-content p-3 rounded" style="background: #f8f9fa;">
+                        <p class="mb-0" style="white-space: pre-wrap;">{{ nudge.message }}</p>
+                    </div>
+
+                    {% if nudge.is_read and nudge.read_at %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-check-all text-success"></i> Read on {{ nudge.read_at.strftime('%b %d at %I:%M %p') }}
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-teal" onclick="openReplyModal({{ nudge.connection_id }}, '{{ nudge.sender.first_name }}', {{ nudge.id }})">
+                            <i class="bi bi-reply-fill"></i> Reply
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+        <h4 class="mt-3 text-muted">No messages yet</h4>
+        <p class="text-muted">Your CheerUp Buddies haven't sent you any messages yet.</p>
+        <a href="{{ url_for('family_connections') }}" class="btn btn-indigo mt-3">
+            <i class="bi bi-people"></i> Manage Your Buddies
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Reply Modal -->
+<div class="modal fade" id="replyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, #6610f2, #14b8a6);">
+                <h5 class="modal-title text-white fw-bold">
+                    <i class="bi bi-reply-fill me-2"></i>Reply to Message
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="replyConnectionId">
+                <input type="hidden" id="replyToNudgeId">
+                <div class="alert alert-light border mb-4">
+                    <i class="bi bi-info-circle text-indigo me-2"></i>
+                    Replying to <strong id="replySenderName"></strong>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Your Reply</label>
+                    <textarea class="form-control" id="replyText" rows="5" maxlength="500" 
+                              placeholder="Write your reply here..." style="resize: none;"></textarea>
+                    <div class="d-flex justify-content-between mt-2">
+                        <small class="text-muted">Maximum 500 characters</small>
+                        <small class="fw-bold"><span id="replyCharCount">0</span>/500</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light btn-lg px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-lg px-4" onclick="sendReply()" 
+                        style="background: linear-gradient(135deg, #6610f2, #14b8a6); color: white;">
+                    <i class="bi bi-send-fill me-2"></i>Send Reply
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openReplyModal(connectionId, senderName, nudgeId) {
+    document.getElementById('replyConnectionId').value = connectionId;
+    document.getElementById('replyToNudgeId').value = nudgeId;
+    document.getElementById('replySenderName').textContent = senderName;
+    document.getElementById('replyText').value = '';
+    document.getElementById('replyCharCount').textContent = '0';
+    new bootstrap.Modal(document.getElementById('replyModal')).show();
+}
+
+document.getElementById('replyText').addEventListener('input', function() {
+    document.getElementById('replyCharCount').textContent = this.value.length;
+});
+
+async function sendReply() {
+    const connectionId = document.getElementById('replyConnectionId').value;
+    const message = document.getElementById('replyText').value.trim();
+    
+    if (!message) {
+        alert('Please write a message');
+        return;
+    }
+    
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    try {
+        const response = await fetch('/family/send-nudge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                connection_id: parseInt(connectionId),
+                message: message,
+                nudge_type: 'reply'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            bootstrap.Modal.getInstance(document.getElementById('replyModal')).hide();
+            alert('Reply sent successfully!');
+            window.location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Failed to send reply');
+    }
+}
+</script>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(102, 16, 242, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-content {
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+</style>
+{% endblock %}

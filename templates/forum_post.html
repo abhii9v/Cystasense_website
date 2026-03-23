@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Forum - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum') }}">Forum</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum_category', category_id=post.category.id) }}">{{ post.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ post.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="flex-grow-1">
+                    <h3 class="mb-0" id="postTitle">{{ post.title }}</h3>
+                    <input type="text" class="form-control d-none" id="postTitleEdit" value="{{ post.title }}">
+                </div>
+                {% if current_user.is_authenticated and current_user.id == post.user_id %}
+                <div>
+                    <button class="btn btn-sm btn-outline-primary" id="editBtn" onclick="toggleEdit()">
+                        <i class="bi bi-pencil"></i> Edit
+                    </button>
+                    <button class="btn btn-sm btn-primary d-none" id="saveBtn" onclick="saveEdit()">
+                        <i class="bi bi-check-lg"></i> Save
+                    </button>
+                    <button class="btn btn-sm btn-secondary d-none" id="cancelBtn" onclick="cancelEdit()">
+                        <i class="bi bi-x-lg"></i> Cancel
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-person-circle text-primary me-2" style="font-size: 2rem;"></i>
+                <div>
+                    <strong>{{ post.user.full_name }}</strong>
+                    <div class="text-muted small">
+                        <i class="bi bi-clock"></i> {{ post.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                        <span class="mx-2">•</span>
+                        <i class="bi bi-eye"></i> {{ post.views_count }} views
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="post-content" id="postContent">
+                {{ post.content|safe }}
+            </div>
+            <textarea class="form-control d-none" id="postContentEdit" rows="8">{{ post.content }}</textarea>
+            <hr>
+            <div class="mt-3 d-flex gap-2">
+                {% if current_user.is_authenticated %}
+                <button class="btn btn-sm btn-outline-success reaction-btn-like" 
+                        onclick="togglePostReaction({{ post.id }}, 'like', this)">
+                    <i class="bi bi-hand-thumbs-up"></i>
+                    <span class="reaction-count-like">{{ post_like_count }}</span>
+                </button>
+                <button class="btn btn-sm btn-outline-danger reaction-btn-dislike" 
+                        onclick="togglePostReaction({{ post.id }}, 'dislike', this)">
+                    <i class="bi bi-hand-thumbs-down"></i>
+                    <span class="reaction-count-dislike">{{ post_dislike_count }}</span>
+                </button>
+                {% else %}
+                <span class="text-muted small">
+                    <i class="bi bi-hand-thumbs-up"></i> {{ post_like_count }}
+                    <i class="bi bi-hand-thumbs-down ms-2"></i> {{ post_dislike_count }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <h5 class="mb-3">
+        <i class="bi bi-chat-left-text"></i> Replies ({{ replies_data|length }})
+    </h5>
+
+    {% for data in replies_data %}
+    <div class="card mb-3 reply-card">
+        <div class="card-body">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-person-circle text-primary me-3" style="font-size: 2.5rem;"></i>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ data.reply.user.full_name }}</strong>
+                            <div class="text-muted small">
+                                <i class="bi bi-clock"></i> {{ data.reply.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                            </div>
+                        </div>
+                        {% if data.reply.is_solution %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle"></i> Solution
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-2">
+                        {{ data.reply.content|safe }}
+                    </div>
+                    <div class="mt-2 d-flex gap-2">
+                        {% if current_user.is_authenticated %}
+                        <button class="btn btn-sm btn-outline-success reaction-btn-like" 
+                                onclick="toggleReaction({{ data.reply.id }}, 'like', this)">
+                            <i class="bi bi-hand-thumbs-up"></i>
+                            <span class="reaction-count-like">{{ data.like_count }}</span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger reaction-btn-dislike" 
+                                onclick="toggleReaction({{ data.reply.id }}, 'dislike', this)">
+                            <i class="bi bi-hand-thumbs-down"></i>
+                            <span class="reaction-count-dislike">{{ data.dislike_count }}</span>
+                        </button>
+                        {% else %}
+                        <span class="text-muted small">
+                            <i class="bi bi-hand-thumbs-up"></i> {{ data.like_count }}
+                            <i class="bi bi-hand-thumbs-down ms-2"></i> {{ data.dislike_count }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if current_user.is_authenticated %}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h6 class="mb-3">Add Your Reply</h6>
+            <form id="replyForm">
+                <div class="mb-3">
+                    <textarea class="form-control" id="replyContent" rows="4" placeholder="Share your thoughts..." required></textarea>
+                    <div id="replyWarning" class="alert alert-warning mt-2 d-none" role="alert"></div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send"></i> Post Reply
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="card mt-4">
+        <div class="card-body text-center">
+            <p class="mb-0">
+                <a href="{{ url_for('login') }}">Login</a> to reply to this post
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.post-content {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.reply-card {
+    border-left: 3px solid var(--primary-color);
+}
+
+.reaction-btn-like,
+.reaction-btn-dislike {
+    transition: all 0.2s ease;
+}
+
+.reaction-btn-like:hover,
+.reaction-btn-dislike:hover {
+    transform: scale(1.05);
+}
+
+.reaction-btn-like i,
+.reaction-btn-dislike i {
+    margin-right: 4px;
+}
+</style>
+
+<script>
+// Content moderation - inappropriate words list
+const inappropriateWords = {
+    'stupid': 'unwise, not helpful, confusing',
+    'idiot': 'person, individual, someone',
+    'dumb': 'unclear, confusing, not well thought out',
+    'moron': 'person who may not understand',
+    'fat': 'plus-size, curvy, larger body',
+    'ugly': 'different appearance, unique look',
+    'worthless': 'struggling, going through challenges',
+    'loser': 'person facing difficulties',
+    'failure': 'learning experience, setback',
+    'pathetic': 'unfortunate, challenging',
+    'damn': 'darn, frustrating',
+    'hell': 'difficult situation, tough time',
+    'crap': 'not great, disappointing',
+    'jerk': 'unkind person, difficult person',
+    'bitch': 'difficult person, unkind individual',
+    'ass': 'rude person, difficult individual',
+    'bastard': 'unkind person',
+    'shit': 'not great, disappointing',
+    'fuck': 'frustrating, annoying',
+    'fucking': 'very, extremely'
+};
+
+function checkContent(text) {
+    const textLower = text.toLowerCase();
+    const flaggedWords = [];
+    const suggestions = {};
+    
+    for (const [word, alternative] of Object.entries(inappropriateWords)) {
+        const pattern = new RegExp('\\b' + word + '\\b', 'i');
+        if (pattern.test(textLower)) {
+            flaggedWords.push(word);
+            suggestions[word] = alternative;
+        }
+    }
+    
+    return { flaggedWords, suggestions };
+}
+
+function showWarning(elementId, flaggedWords, suggestions) {
+    const warningDiv = document.getElementById(elementId);
+    
+    if (flaggedWords.length === 0) {
+        warningDiv.classList.add('d-none');
+        return;
+    }
+    
+    let warningHtml = '<strong><i class="bi bi-exclamation-triangle"></i> Inappropriate content detected</strong><br>';
+    warningHtml += '<small>Our community values respectful and supportive language. Please consider these alternatives:</small><br><br>';
+    
+    for (const word of flaggedWords) {
+        warningHtml += `<div class="mt-1">• Instead of "<strong>${word}</strong>", try: <em>${suggestions[word]}</em></div>`;
+    }
+    
+    warningDiv.innerHTML = warningHtml;
+    warningDiv.classList.remove('d-none');
+}
+
+// Real-time content checking for reply
+document.getElementById('replyContent')?.addEventListener('input', function() {
+    const result = checkContent(this.value);
+    showWarning('replyWarning', result.flaggedWords, result.suggestions);
+});
+
+let originalTitle = '';
+let originalContent = '';
+
+function toggleEdit() {
+    const postTitle = document.getElementById('postTitle');
+    const postTitleEdit = document.getElementById('postTitleEdit');
+    const postContent = document.getElementById('postContent');
+    const postContentEdit = document.getElementById('postContentEdit');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    
+    // Store original values
+    originalTitle = postTitle.textContent;
+    originalContent = postContentEdit.value;
+    
+    // Toggle visibility
+    postTitle.classList.add('d-none');
+    postTitleEdit.classList.remove('d-none');
+    postContent.classList.add('d-none');
+    postContentEdit.classList.remove('d-none');
+    editBtn.classList.add('d-none');
+    saveBtn.classList.remove('d-none');
+    cancelBtn.classList.remove('d-none');
+}
+
+function cancelEdit() {
+    const postTitle = document.getElementById('postTitle');
+    const postTitleEdit = document.getElementById('postTitleEdit');
+    const postContent = document.getElementById('postContent');
+    const postContentEdit = document.getElementById('postContentEdit');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    
+    // Restore original values
+    postTitleEdit.value = originalTitle;
+    postContentEdit.value = originalContent;
+    
+    // Toggle visibility back
+    postTitle.classList.remove('d-none');
+    postTitleEdit.classList.add('d-none');
+    postContent.classList.remove('d-none');
+    postContentEdit.classList.add('d-none');
+    editBtn.classList.remove('d-none');
+    saveBtn.classList.add('d-none');
+    cancelBtn.classList.add('d-none');
+}
+
+function saveEdit() {
+    const postTitleEdit = document.getElementById('postTitleEdit');
+    const postContentEdit = document.getElementById('postContentEdit');
+    
+    const newTitle = postTitleEdit.value.trim();
+    const newContent = postContentEdit.value.trim();
+    
+    if (!newTitle || !newContent) {
+        showToast('Title and content cannot be empty', 'danger');
+        return;
+    }
+    
+    fetch('/forum/post/{{ post.id }}/edit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify({ 
+            title: newTitle,
+            content: newContent 
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || 'Failed to update post');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Post updated successfully!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Failed to update post', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast(error.message || 'Error updating post', 'danger');
+    });
+}
+
+document.getElementById('replyForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const content = document.getElementById('replyContent').value;
+    
+    fetch('/forum/post/{{ post.id }}/reply', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify({ content: content })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || 'Failed to post reply');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Reply posted successfully!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast('Failed to post reply', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error posting reply', 'danger');
+    });
+});
+
+function showToast(message, type = 'success') {
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toast = document.querySelector('.toast:last-child');
+    new bootstrap.Toast(toast).show();
+    setTimeout(() => toast?.remove(), 5000);
+}
+
+function toggleReaction(replyId, reactionType, button) {
+    const parent = button.closest('.d-flex');
+    
+    fetch(`/forum/reply/${replyId}/react`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify({ reaction_type: reactionType })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const countSpan = button.querySelector(`.reaction-count-${reactionType}`);
+            const currentCount = parseInt(countSpan.textContent) || 0;
+            
+            if (data.action === 'added') {
+                countSpan.textContent = currentCount + 1;
+                
+                // If another reaction was removed, update its counter
+                if (data.removed_type) {
+                    const otherButton = parent.querySelector(`.reaction-btn-${data.removed_type}`);
+                    if (otherButton) {
+                        const otherCount = otherButton.querySelector(`.reaction-count-${data.removed_type}`);
+                        otherCount.textContent = Math.max(0, parseInt(otherCount.textContent) - 1);
+                    }
+                }
+            } else {
+                countSpan.textContent = Math.max(0, currentCount - 1);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to update reaction', 'danger');
+    });
+}
+
+function togglePostReaction(postId, reactionType, button) {
+    const parent = button.closest('.d-flex');
+    
+    fetch(`/forum/post/${postId}/react`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify({ reaction_type: reactionType })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const countSpan = button.querySelector(`.reaction-count-${reactionType}`);
+            const currentCount = parseInt(countSpan.textContent) || 0;
+            
+            if (data.action === 'added') {
+                countSpan.textContent = currentCount + 1;
+                
+                // If another reaction was removed, update its counter
+                if (data.removed_type) {
+                    const otherButton = parent.querySelector(`.reaction-btn-${data.removed_type}`);
+                    if (otherButton) {
+                        const otherCount = otherButton.querySelector(`.reaction-count-${data.removed_type}`);
+                        otherCount.textContent = Math.max(0, parseInt(otherCount.textContent) - 1);
+                    }
+                }
+            } else {
+                countSpan.textContent = Math.max(0, currentCount - 1);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to update reaction', 'danger');
+    });
+}
+</script>
+{% endblock %}

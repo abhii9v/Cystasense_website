@@ -1,0 +1,550 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-circle mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 4rem; color: var(--primary-color);"></i>
+                        </div>
+                        <h5 class="mb-1">Welcome back!</h5>
+                        <p class="text-muted mb-0">{{ user.first_name or 'User' }}</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <nav class="nav flex-column gap-2">
+                        {% if is_supporter_view|default(false) %}
+                        <!-- Supporter's simplified sidebar -->
+                        <a class="nav-link active rounded" href="{{ url_for('family_connections') }}">
+                            <i class="bi bi-people"></i> <span class="ms-2">My Connections</span>
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('view_nudges') }}">
+                            <i class="bi bi-chat-heart text-teal"></i> <span class="ms-2">Messages</span>
+                            {% if unread_messages|default(0) > 0 %}
+                            <span class="badge bg-danger ms-auto">{{ unread_messages }}</span>
+                            {% endif %}
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('learn') }}">
+                            <i class="bi bi-book"></i> <span class="ms-2">Learn</span>
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('profile') }}">
+                            <i class="bi bi-person"></i> <span class="ms-2">My Profile</span>
+                        </a>
+                        {% else %}
+                        <!-- PCOS User's full sidebar -->
+                        <a class="nav-link active rounded" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> <span class="ms-2">Dashboard</span>
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('learn') }}">
+                            <i class="bi bi-book"></i> <span class="ms-2">Learn</span>
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('tracker') }}">
+                            <i class="bi bi-graph-up"></i> <span class="ms-2">Health Tracker</span>
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('diet_exercise') }}">
+                            <i class="bi bi-apple"></i> <span class="ms-2">Diet & Exercise</span>
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('reminders') }}">
+                            <i class="bi bi-bell"></i> <span class="ms-2">Reminders</span>
+                            {% if upcoming_reminders|length > 0 %}
+                            <span class="badge bg-danger ms-auto">{{ upcoming_reminders|length }}</span>
+                            {% endif %}
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('analytics') }}">
+                            <i class="bi bi-bar-chart"></i> <span class="ms-2">Analytics</span>
+                        </a>
+                        {% if user.user_role == 'pcos_user' %}
+                        <a class="nav-link rounded" href="{{ url_for('view_nudges') }}">
+                            <i class="bi bi-chat-heart text-teal"></i> <span class="ms-2">Messages</span>
+                            {% if unread_messages|default(0) > 0 %}
+                            <span class="badge bg-danger ms-auto">{{ unread_messages }}</span>
+                            {% endif %}
+                        </a>
+                        <a class="nav-link rounded" href="{{ url_for('family_connections') }}">
+                            <i class="bi bi-people"></i> <span class="ms-2">Family Support</span>
+                            {% if pending_requests|default(0) > 0 %}
+                            <span class="badge bg-warning ms-auto">{{ pending_requests }}</span>
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                        <a class="nav-link rounded" href="{{ url_for('profile') }}">
+                            <i class="bi bi-person"></i> <span class="ms-2">My Profile</span>
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <!-- Supporter View Notice -->
+            {% if is_supporter_view|default(false) %}
+            <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <i class="bi bi-eye"></i> <strong>Viewing {{ user.full_name }}'s Dashboard</strong> 
+                    <span class="ms-2">
+                        {% if connection.can_view_goals %}
+                        <span class="badge bg-success">Can View Goals</span>
+                        {% endif %}
+                        {% if connection.can_view_symptoms %}
+                        <span class="badge bg-success">Can View Symptoms</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <a href="{{ url_for('family_connections') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Connections
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">{% if is_supporter_view|default(false) %}{{ user.full_name }}'s {% else %}Your {% endif %}Health Dashboard</h2>
+                    <p class="text-muted mb-0">Track your progress and stay on top of your health goals</p>
+                </div>
+                <div class="text-muted">
+                    <i class="bi bi-calendar3"></i> {{ today_date }}
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="mb-2 opacity-75">Symptoms Logged</p>
+                                    <h2 class="mb-0 fw-bold">{{ recent_symptoms|length }}</h2>
+                                    <small class="opacity-75">This week</small>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-clipboard-data"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="mb-2 opacity-75">Cycle Length</p>
+                                    <h2 class="mb-0 fw-bold">{% if recent_cycle %}{{ recent_cycle.cycle_length or '--' }}{% else %}--{% endif %}</h2>
+                                    <small class="opacity-75">Days</small>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-calendar-heart"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="mb-2 opacity-75">Reminders</p>
+                                    <h2 class="mb-0 fw-bold">{{ upcoming_reminders|length }}</h2>
+                                    <small class="opacity-75">Upcoming</small>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-bell"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="mb-2 opacity-75">Health Score</p>
+                                    <h2 class="mb-0 fw-bold">{{ health_score|default(0) }}<small class="fs-5">/5</small></h2>
+                                    <small class="opacity-75">{{ health_emoji|default('📊') }} {{ health_status|default('Getting Started') }}</small>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-heart-pulse"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions (Hidden for Supporters) -->
+            {% if not is_supporter_view|default(false) %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning-fill text-warning"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3 col-6">
+                            <a href="{{ url_for('tracker') }}" class="quick-action-btn">
+                                <div class="quick-action-icon" style="background: rgba(102, 16, 242, 0.1);">
+                                    <i class="bi bi-plus-circle" style="color: var(--primary-color);"></i>
+                                </div>
+                                <div class="fw-semibold mt-2">Log Symptoms</div>
+                                <small class="text-muted">Track your health</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="{{ url_for('diet_exercise') }}" class="quick-action-btn">
+                                <div class="quick-action-icon" style="background: rgba(67, 233, 123, 0.1);">
+                                    <i class="bi bi-apple" style="color: #43e97b;"></i>
+                                </div>
+                                <div class="fw-semibold mt-2">Plan Meals</div>
+                                <small class="text-muted">Nutrition tracking</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="{{ url_for('doctors') }}" class="quick-action-btn">
+                                <div class="quick-action-icon" style="background: rgba(79, 172, 254, 0.1);">
+                                    <i class="bi bi-people" style="color: #4facfe;"></i>
+                                </div>
+                                <div class="fw-semibold mt-2">Find Doctors</div>
+                                <small class="text-muted">See a specialist</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="{{ url_for('reminders') }}" class="quick-action-btn">
+                                <div class="quick-action-icon" style="background: rgba(240, 147, 251, 0.1);">
+                                    <i class="bi bi-bell" style="color: #f093fb;"></i>
+                                </div>
+                                <div class="fw-semibold mt-2">Set Reminder</div>
+                                <small class="text-muted">Stay on track</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="row g-4 mb-4">
+                <!-- Recent Symptoms -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-clipboard-data text-primary"></i> Recent Symptoms</h5>
+                            {% if not is_supporter_view|default(false) %}
+                            <a href="{{ url_for('tracker') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus"></i> Log New
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            {% if recent_symptoms %}
+                                <div class="symptoms-list">
+                                    {% for symptom in recent_symptoms[:5] %}
+                                    <div class="symptom-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold text-primary mb-1">
+                                                    <i class="bi bi-calendar3"></i> {{ symptom.date.strftime('%b %d, %Y') }}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    {% if symptom.acne_severity %}
+                                                        <span class="badge rounded-pill bg-secondary">🔴 Acne {{ symptom.acne_severity }}/5</span>
+                                                    {% endif %}
+                                                    {% if symptom.fatigue_level %}
+                                                        <span class="badge rounded-pill bg-warning text-dark">😴 Fatigue {{ symptom.fatigue_level }}/5</span>
+                                                    {% endif %}
+                                                    {% if symptom.mood_swings %}
+                                                        <span class="badge rounded-pill bg-info">😢 Mood {{ symptom.mood_swings }}/5</span>
+                                                    {% endif %}
+                                                    {% if symptom.anxiety_level %}
+                                                        <span class="badge rounded-pill bg-danger">😰 Anxiety {{ symptom.anxiety_level }}/5</span>
+                                                    {% endif %}
+                                                    {% if symptom.bloating %}
+                                                        <span class="badge rounded-pill bg-primary">🎈 Bloating</span>
+                                                    {% endif %}
+                                                </div>
+                                                {% if symptom.notes %}
+                                                <p class="text-muted small mb-0 mt-1">{{ symptom.notes[:50] }}{% if symptom.notes|length > 50 %}...{% endif %}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if not loop.last %}<hr class="my-2">{% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="bi bi-clipboard-data text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mt-3 mb-0">No symptoms logged yet</p>
+                                    <small class="text-muted">Start tracking to get personalized insights</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Reminders -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-bell text-primary"></i> Upcoming Reminders</h5>
+                            <a href="{{ url_for('reminders') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus"></i> Add New
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            {% if upcoming_reminders %}
+                                <div class="reminders-list">
+                                    {% for reminder in upcoming_reminders[:5] %}
+                                    <div class="reminder-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold mb-1">{{ reminder.title }}</div>
+                                                <div class="text-muted small mb-1">
+                                                    <i class="bi bi-clock"></i> {{ reminder.reminder_time.strftime('%b %d, %Y at %I:%M %p') }}
+                                                </div>
+                                                <span class="badge bg-primary">
+                                                    {% if reminder.reminder_type == 'medication' %}💊
+                                                    {% elif reminder.reminder_type == 'appointment' %}📅
+                                                    {% elif reminder.reminder_type == 'exercise' %}💪
+                                                    {% elif reminder.reminder_type == 'hydration' %}💧
+                                                    {% elif reminder.reminder_type == 'diet' %}🥗
+                                                    {% else %}🔔{% endif %}
+                                                    {{ reminder.reminder_type.title() }}
+                                                </span>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-success" onclick="markCompleted({{ reminder.id }})" title="Mark as complete">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% if not loop.last %}<hr class="my-2">{% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="bi bi-bell-slash text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mt-3 mb-0">No reminders set</p>
+                                    <small class="text-muted">Create reminders to stay on track</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Health Tips -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb text-warning"></i> Daily Wellness Tips</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="tip-card">
+                                <div class="tip-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                                    <i class="bi bi-droplet"></i>
+                                </div>
+                                <h6 class="mt-3 mb-2">Stay Hydrated</h6>
+                                <p class="text-muted small mb-0">Drink 8-10 glasses of water daily to support hormone balance and reduce bloating.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-card">
+                                <div class="tip-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                                    <i class="bi bi-moon-stars"></i>
+                                </div>
+                                <h6 class="mt-3 mb-2">Quality Sleep</h6>
+                                <p class="text-muted small mb-0">Get 7-9 hours of sleep to regulate insulin levels and improve hormonal balance.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-card">
+                                <div class="tip-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                                    <i class="bi bi-heart-pulse"></i>
+                                </div>
+                                <h6 class="mt-3 mb-2">Regular Exercise</h6>
+                                <p class="text-muted small mb-0">30 minutes of moderate activity daily helps manage symptoms and boost mood.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.sidebar .nav-link {
+    color: #6c757d;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(102, 16, 242, 0.1);
+    color: var(--primary-color);
+}
+
+.sidebar .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sidebar .nav-link i {
+    width: 20px;
+}
+
+.stat-card {
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.5;
+}
+
+.quick-action-btn {
+    display: block;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s;
+    border: 2px solid #e9ecef;
+}
+
+.quick-action-btn:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.quick-action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.symptom-item, .reminder-item {
+    padding: 0.5rem 0;
+}
+
+.tip-card {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    height: 100%;
+    transition: all 0.3s;
+}
+
+.tip-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+}
+
+.tip-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+}
+</style>
+
+<script>
+// Toast notification system
+function showToast(message, type = 'success') {
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+    
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toast = document.querySelector('.toast:last-child');
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    setTimeout(() => {
+        if (toast && toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+function markCompleted(reminderId) {
+    if (!confirm('Mark this reminder as completed?')) return;
+    
+    fetch(`/reminders/${reminderId}/complete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('✅ Reminder marked as completed!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast('Failed to mark reminder as completed', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error completing reminder', 'danger');
+    });
+}
+
+// Add current date
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+    const dateElements = document.querySelectorAll('.today-date');
+    dateElements.forEach(el => el.textContent = today);
+});
+</script>
+{% endblock %}

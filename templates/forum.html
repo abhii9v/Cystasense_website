@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Discussion Forum - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="bi bi-chat-dots" style="color: var(--primary-color);"></i> Discussion Forum
+            </h2>
+            {% if is_supporter %}
+            <p class="text-muted">Discover inspiring stories from women living with PCOS. Read their journeys to better understand and support your loved one.</p>
+            {% else %}
+            <p class="text-muted">Connect with other women, our researchers and clinicians. Share experiences, ask questions, and find support.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if category_data %}
+    <div class="row g-4">
+        {% for item in category_data %}
+        <div class="col-12">
+            <div class="card forum-category-card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-start">
+                                <div class="category-icon me-3">
+                                    <i class="bi {{ item.category.icon or 'bi-chat-square-text' }}"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-2">
+                                        <a href="{{ url_for('forum_category', category_id=item.category.id) }}" class="text-decoration-none">
+                                            {{ item.category.name }}
+                                        </a>
+                                    </h5>
+                                    <p class="text-muted mb-0">{{ item.category.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="forum-stats">
+                                <span class="badge bg-primary me-2">
+                                    <i class="bi bi-file-text"></i> {{ item.posts_count }} posts
+                                </span>
+                                {% if item.latest_post %}
+                                <div class="text-muted small mt-2">
+                                    Latest: {{ item.latest_post.created_at.strftime('%b %d, %Y') }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-chat-dots text-muted" style="font-size: 4rem;"></i>
+        <h5 class="text-muted mt-3">No forum categories available yet</h5>
+        <p class="text-muted">Check back soon for discussion topics!</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.forum-category-card {
+    transition: all 0.3s;
+    border: 1px solid #e9ecef;
+}
+
+.forum-category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    border-color: var(--primary-color);
+}
+
+.category-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+}
+
+.forum-stats .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+</style>
+
+{% include 'components/chat_widget.html' %}
+{% endblock %}

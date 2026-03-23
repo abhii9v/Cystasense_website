@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ track.title }} - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('learn') }}">Learn</a></li>
+            <li class="breadcrumb-item active">{{ track.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <h1 class="mb-3"><i class="bi {{ track.icon }} text-teal"></i> {{ track.title }}</h1>
+            <p class="lead text-muted mb-4">{{ track.description }}</p>
+
+            <div class="list-group mb-4">
+                {% for item in lessons_with_progress %}
+                <a href="{{ url_for('lesson', lesson_id=item.lesson.id) }}" 
+                   class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">
+                                {{ loop.index }}. {{ item.lesson.title }}
+                                {% if item.progress and item.progress.completed_at %}
+                                <i class="bi bi-check-circle-fill text-success ms-2"></i>
+                                {% elif item.progress and item.progress.started_at %}
+                                <i class="bi bi-clock text-warning ms-2"></i>
+                                {% endif %}
+                            </h6>
+                            {% if item.lesson.video_duration_minutes %}
+                            <small class="text-muted">
+                                <i class="bi bi-play-circle"></i> {{ item.lesson.video_duration_minutes }} min
+                            </small>
+                            {% endif %}
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="card-title">Track Info</h5>
+                    {% if track.duration_weeks %}
+                    <p><i class="bi bi-calendar"></i> {{ track.duration_weeks }} week{{ 's' if track.duration_weeks > 1 else '' }}</p>
+                    {% endif %}
+                    <p><i class="bi bi-book"></i> {{ lessons_with_progress|length }} lesson{{ 's' if lessons_with_progress|length > 1 else '' }}</p>
+                    
+                    <hr>
+                    
+                    <h6>Progress</h6>
+                    {% set completed_count = lessons_with_progress|selectattr('progress.completed_at')|list|length %}
+                    <div class="progress mb-2" style="height: 25px;">
+                        <div class="progress-bar bg-teal" role="progressbar" 
+                             style="width: {{ (completed_count / lessons_with_progress|length * 100)|int if lessons_with_progress|length > 0 else 0 }}%;">
+                            {{ (completed_count / lessons_with_progress|length * 100)|int if lessons_with_progress|length > 0 else 0 }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ completed_count }}/{{ lessons_with_progress|length }} completed</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.text-teal { color: #14b8a6 !important; }
+.bg-teal { background-color: #14b8a6 !important; }
+</style>
+{% endblock %}

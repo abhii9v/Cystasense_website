@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100 p-0">
+    <div class="row g-0 h-100">
+        <!-- Left Sidebar - Conversations List -->
+        <div class="col-12 col-md-4 col-lg-3 border-end bg-light" style="height: calc(100vh - 60px); overflow-y: auto;">
+            <div class="p-3 border-bottom bg-white sticky-top">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-heart text-teal"></i> Conversations
+                </h5>
+            </div>
+            
+            <div id="conversationsList">
+                {% if connections %}
+                    {% for conn in connections %}
+                    <div class="conversation-item p-3 border-bottom {% if active_connection and active_connection.id == conn.id %}active{% endif %}" 
+                         onclick="loadChat({{ conn.id }}, '{{ conn.other_user.first_name }} {{ conn.other_user.last_name }}')" 
+                         style="cursor: pointer;">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #6610f2, #14b8a6); color: white;">
+                                <span class="fw-bold">{{ conn.other_user.first_name[0] }}{{ conn.other_user.last_name[0] }}</span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ conn.other_user.first_name }} {{ conn.other_user.last_name }}</h6>
+                                {% if conn.last_message %}
+                                <small class="text-muted d-block text-truncate" style="max-width: 200px;">
+                                    {{ conn.last_message.message[:50] }}{% if conn.last_message.message|length > 50 %}...{% endif %}
+                                </small>
+                                {% else %}
+                                <small class="text-muted">No messages yet</small>
+                                {% endif %}
+                            </div>
+                            {% if conn.unread_count > 0 %}
+                            <span class="badge bg-teal rounded-pill">{{ conn.unread_count }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center p-4">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                        <p class="text-muted mt-3">No connections yet</p>
+                        <a href="{{ url_for('family_connections') }}" class="btn btn-sm btn-indigo">
+                            <i class="bi bi-people"></i> Add Buddies
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Side - Chat Window -->
+        <div class="col-12 col-md-8 col-lg-9 d-flex flex-column" style="height: calc(100vh - 60px);">
+            {% if active_connection %}
+            <!-- Chat Header -->
+            <div class="p-3 border-bottom bg-white">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-circle me-3" style="width: 45px; height: 45px; background: linear-gradient(135deg, #6610f2, #14b8a6); color: white;">
+                        <span class="fw-bold">{{ active_connection.other_user.first_name[0] }}{{ active_connection.other_user.last_name[0] }}</span>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">{{ active_connection.other_user.first_name }} {{ active_connection.other_user.last_name }}</h5>
+                        <small class="text-muted">
+                            {% if active_connection.other_user.user_role == 'family_member' %}
+                                <i class="bi bi-heart"></i> CheerUp Buddy
+                            {% else %}
+                                <i class="bi bi-person"></i> PCOS User
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div class="flex-grow-1 p-3" id="messagesContainer" style="overflow-y: auto; background: #f0f2f5;">
+                <div id="chatMessages">
+                    {% for message in messages %}
+                    <div class="mb-3 d-flex {% if message.sender_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+                        <div style="max-width: 70%;">
+                            {% if message.sender_id != current_user.id %}
+                            <small class="text-muted ms-2">{{ message.sender.first_name }}</small>
+                            {% endif %}
+                            
+                            <!-- Message Type Badge -->
+                            {% if message.nudge_type and message.nudge_type != 'message' %}
+                            <div class="mb-1 {% if message.sender_id == current_user.id %}text-end{% else %}text-start{% endif %}">
+                                <span class="badge bg-secondary" style="font-size: 0.65rem;">
+                                    {% if message.nudge_type == 'encouragement' %}
+                                        <i class="bi bi-heart"></i> Encouragement
+                                    {% elif message.nudge_type == 'reminder' %}
+                                        <i class="bi bi-alarm"></i> Reminder
+                                    {% elif message.nudge_type == 'recipe' %}
+                                        <i class="bi bi-egg-fried"></i> Recipe Tip
+                                    {% elif message.nudge_type == 'activity' %}
+                                        <i class="bi bi-bicycle"></i> Activity Invite
+                                    {% elif message.nudge_type == 'celebration' %}
+                                        <i class="bi bi-trophy"></i> Celebration
+                                    {% else %}
+                                        <i class="bi bi-chat-dots"></i> {{ message.nudge_type.title() }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="message-bubble p-3 rounded-3 {% if message.sender_id == current_user.id %}bg-indigo text-white{% else %}bg-white{% endif %}" 
+                                 style="{% if message.sender_id == current_user.id %}background: linear-gradient(135deg, #6610f2, #14b8a6) !important;{% endif %}">
+                                <p class="mb-1" style="white-space: pre-wrap;">{{ message.message }}</p>
+                                <small class="{% if message.sender_id == current_user.id %}text-white-50{% else %}text-muted{% endif %}" style="font-size: 0.75rem;">
+                                    {{ message.sent_at.strftime('%I:%M %p') }}
+                                    {% if message.sender_id == current_user.id and message.is_read %}
+                                        <i class="bi bi-check-all"></i>
+                                    {% elif message.sender_id == current_user.id %}
+                                        <i class="bi bi-check"></i>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            
+                            <!-- Reaction Buttons -->
+                            <div class="mt-1 d-flex gap-2 {% if message.sender_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+                                {% set likes = message.reactions|selectattr('reaction_type', 'equalto', 'like')|list|length %}
+                                {% set dislikes = message.reactions|selectattr('reaction_type', 'equalto', 'dislike')|list|length %}
+                                {% set user_reaction = message.reactions|selectattr('user_id', 'equalto', current_user.id)|first|default(none) %}
+                                
+                                <button class="btn btn-sm btn-outline-secondary reaction-btn" 
+                                        onclick="reactToMessage({{ message.id }}, 'like')"
+                                        data-message-id="{{ message.id }}"
+                                        data-reaction-type="like"
+                                        style="border-radius: 15px; padding: 2px 8px; font-size: 0.75rem; {% if user_reaction and user_reaction.reaction_type == 'like' %}background: #6610f2; color: white; border-color: #6610f2;{% endif %}">
+                                    <i class="bi bi-hand-thumbs-up"></i> <span class="likes-count-{{ message.id }}">{{ likes if likes > 0 else '' }}</span>
+                                </button>
+                                
+                                <button class="btn btn-sm btn-outline-secondary reaction-btn" 
+                                        onclick="reactToMessage({{ message.id }}, 'dislike')"
+                                        data-message-id="{{ message.id }}"
+                                        data-reaction-type="dislike"
+                                        style="border-radius: 15px; padding: 2px 8px; font-size: 0.75rem; {% if user_reaction and user_reaction.reaction_type == 'dislike' %}background: #dc3545; color: white; border-color: #dc3545;{% endif %}">
+                                    <i class="bi bi-hand-thumbs-down"></i> <span class="dislikes-count-{{ message.id }}">{{ dislikes if dislikes > 0 else '' }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="p-3 border-top bg-white">
+                <form id="messageForm" class="d-flex gap-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" id="connectionId" value="{{ active_connection.id }}">
+                    <div class="flex-grow-1">
+                        <textarea class="form-control" id="messageInput" rows="1" 
+                                  placeholder="Type a message..." 
+                                  style="resize: none; border-radius: 25px;"
+                                  maxlength="500"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-lg rounded-circle" 
+                            style="width: 50px; height: 50px; background: linear-gradient(135deg, #6610f2, #14b8a6); color: white;">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </form>
+                <small class="text-muted ms-2"><span id="charCount">0</span>/500</small>
+            </div>
+            {% else %}
+            <!-- No Chat Selected -->
+            <div class="d-flex align-items-center justify-content-center h-100 text-center">
+                <div>
+                    <i class="bi bi-chat-dots" style="font-size: 5rem; color: #ddd;"></i>
+                    <h4 class="mt-3 text-muted">Select a conversation to start chatting</h4>
+                    <p class="text-muted">Choose a buddy from the left to view your messages</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-resize textarea
+const messageInput = document.getElementById('messageInput');
+if (messageInput) {
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        document.getElementById('charCount').textContent = this.value.length;
+    });
+
+    // Enter to send (Shift+Enter for new line)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+        }
+    });
+}
+
+// Scroll to bottom of messages
+function scrollToBottom() {
+    const container = document.getElementById('messagesContainer');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+    }
+}
+
+// Load chat for a specific connection
+function loadChat(connectionId, name) {
+    window.location.href = `/family/chat/${connectionId}`;
+}
+
+// Send message
+document.getElementById('messageForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    const connectionId = document.getElementById('connectionId').value;
+    
+    if (!message) return;
+    
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    try {
+        const response = await fetch('/family/send-nudge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                connection_id: parseInt(connectionId),
+                message: message,
+                nudge_type: 'message'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            // Add message to chat immediately
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'mb-3 d-flex justify-content-end';
+            messageDiv.innerHTML = `
+                <div style="max-width: 70%;">
+                    <div class="message-bubble p-3 rounded-3 text-white" 
+                         style="background: linear-gradient(135deg, #6610f2, #14b8a6) !important;">
+                        <p class="mb-1" style="white-space: pre-wrap;">${message}</p>
+                        <small class="text-white-50" style="font-size: 0.75rem;">
+                            ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                            <i class="bi bi-check"></i>
+                        </small>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            document.getElementById('charCount').textContent = '0';
+            scrollToBottom();
+        } else {
+            alert('Error sending message: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to send message');
+    }
+});
+
+// React to message
+async function reactToMessage(messageId, reactionType) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    try {
+        const response = await fetch(`/message/${messageId}/react`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                reaction_type: reactionType
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            // Update reaction counts
+            const likeCountSpan = document.querySelector(`.likes-count-${messageId}`);
+            const dislikeCountSpan = document.querySelector(`.dislikes-count-${messageId}`);
+            
+            if (likeCountSpan) {
+                likeCountSpan.textContent = result.likes_count > 0 ? result.likes_count : '';
+            }
+            if (dislikeCountSpan) {
+                dislikeCountSpan.textContent = result.dislikes_count > 0 ? result.dislikes_count : '';
+            }
+            
+            // Update button styles
+            const likeBtn = document.querySelector(`button[data-message-id="${messageId}"][data-reaction-type="like"]`);
+            const dislikeBtn = document.querySelector(`button[data-message-id="${messageId}"][data-reaction-type="dislike"]`);
+            
+            // Reset both buttons
+            if (likeBtn) {
+                likeBtn.style.background = '';
+                likeBtn.style.color = '';
+                likeBtn.style.borderColor = '';
+            }
+            if (dislikeBtn) {
+                dislikeBtn.style.background = '';
+                dislikeBtn.style.color = '';
+                dislikeBtn.style.borderColor = '';
+            }
+            
+            // Highlight active reaction
+            if (result.action === 'added') {
+                if (reactionType === 'like' && likeBtn) {
+                    likeBtn.style.background = '#6610f2';
+                    likeBtn.style.color = 'white';
+                    likeBtn.style.borderColor = '#6610f2';
+                } else if (reactionType === 'dislike' && dislikeBtn) {
+                    dislikeBtn.style.background = '#dc3545';
+                    dislikeBtn.style.color = 'white';
+                    dislikeBtn.style.borderColor = '#dc3545';
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error reacting to message:', error);
+    }
+}
+
+// Scroll to bottom on load
+scrollToBottom();
+</script>
+
+<style>
+.conversation-item:hover {
+    background-color: #e9ecef;
+}
+
+.conversation-item.active {
+    background-color: #e7f3ff;
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.message-bubble {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+#messagesContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+#messagesContainer::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#messagesContainer::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#messagesContainer::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+</style>
+{% endblock %}

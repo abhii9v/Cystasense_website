@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}CystaSense - Women's Health Management{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #6610f2;
+            --secondary-color: #d1c4f9;
+            --accent-color: #14b8a6;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            text-decoration: none !important;
+        }
+        
+        .brand-text {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo-symbol {
+            display: flex;
+            align-items: center;
+            font-size: 2.2rem;
+            position: relative;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #520dc2;
+            border-color: #520dc2;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .sidebar {
+            background-color: #f8f9fa;
+            min-height: calc(100vh - 60px);
+        }
+        
+        .nav-link {
+            color: #666;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 0;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+        
+        .dashboard-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <span class="logo-symbol">
+                    <i class="bi bi-heart-pulse-fill" style="color: #14b8a6;"></i>
+                    <i class="bi bi-person-hearts" style="color: var(--primary-color); margin-left: -8px;"></i>
+                </span>
+                <span class="brand-text">CystaSense</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('awareness') }}">
+                            <i class="bi bi-book"></i> Learn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('forum') }}">
+                            <i class="bi bi-chat-dots"></i> Forum
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('health_assistant') }}">
+                            <i class="bi bi-robot"></i> AI Assistant
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    {% if current_user.user_role == 'pcos_user' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('tracker') }}">
+                            <i class="bi bi-graph-up"></i> Track Symptoms
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('analytics') }}">
+                            <i class="bi bi-bar-chart"></i> Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('chat') }}">
+                            <i class="bi bi-chat-heart text-teal"></i> Messages
+                            {% if unread_messages|default(0) > 0 %}
+                            <span class="badge bg-danger ms-1">{{ unread_messages }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('diet_exercise') }}">
+                            <i class="bi bi-apple"></i> Diet & Exercise
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('doctors') }}">
+                            <i class="bi bi-people"></i> Find Specialists
+                        </a>
+                    </li>
+                    {% elif current_user.user_role == 'family_member' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('family_connections') }}">
+                            <i class="bi bi-people"></i> My Connections
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('chat') }}">
+                            <i class="bi bi-chat-heart text-teal"></i> Messages
+                            {% if unread_messages|default(0) > 0 %}
+                            <span class="badge bg-danger ms-1">{{ unread_messages }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('doctors') }}">
+                            <i class="bi bi-hospital"></i> Find Specialists
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            {% if current_user.profile_image_url %}
+                                <img src="{{ current_user.profile_image_url }}" alt="Profile" class="rounded-circle" width="30" height="30">
+                            {% else %}
+                                <i class="bi bi-person-circle"></i>
+                            {% endif %}
+                            {{ current_user.first_name or 'User' }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('reminders') }}"><i class="bi bi-bell"></i> Reminders</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    {% if request.endpoint not in ['login', 'register'] %}
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3" href="{{ url_for('login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-heart-pulse"></i> CystaSense</h5>
+                    <p>Comprehensive women's health management platform for PCOD/PCOS support.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Resources</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('awareness') }}" class="text-light">Educational Content</a></li>
+                        <li><a href="{{ url_for('doctors') }}" class="text-light">Find Specialists</a></li>
+                        <li><a href="{{ url_for('privacy_policy') }}" class="text-light">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Support</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('help_center') }}" class="text-light">Help Center</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-light">Contact Us</a></li>
+                        <li><a href="{{ url_for('emergency_support') }}" class="text-light">Emergency Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2025 PCOD Care. Designed for women's health and wellness.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- CSRF Token Setup -->
+    <script>
+        // Global CSRF token setup for AJAX requests
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        // Set up CSRF token for all fetch requests
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options = {}) {
+            if (!options.headers) {
+                options.headers = {};
+            }
+            
+            // Add CSRF token for POST, PUT, PATCH, DELETE requests
+            if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method?.toUpperCase())) {
+                options.headers['X-CSRFToken'] = csrfToken;
+            }
+            
+            return originalFetch.call(this, url, options);
+        };
+    </script>
+
+    {% if current_user.is_authenticated %}
+    <!-- Daily Reminder System -->
+    <script>
+        // Check and show daily reminder
+        async function checkDailyReminder() {
+            // Check if user has enabled reminders
+            const reminderEnabled = {{ 'true' if current_user.reminder_enabled else 'false' }};
+            const reminderTime = '{{ current_user.reminder_time or "" }}';
+            const reminderTimezone = '{{ current_user.reminder_timezone or "" }}';
+            
+            if (!reminderEnabled || !reminderTime) {
+                return;
+            }
+
+            // Request notification permission if not granted
+            if ('Notification' in window && Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+
+            // Check if notification permission is granted
+            if (!('Notification' in window) || Notification.permission !== 'granted') {
+                return;
+            }
+
+            // Check localStorage to see if reminder was shown today
+            const lastShown = localStorage.getItem('lastReminderShown');
+            const today = new Date().toDateString();
+            
+            if (lastShown === today) {
+                return; // Already shown today
+            }
+
+            // Get current time in user's timezone
+            const now = new Date();
+            const userTimezone = reminderTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+            
+            // Parse reminder time (HH:MM format)
+            const [hours, minutes] = reminderTime.split(':').map(Number);
+            
+            // Create date object for reminder time today
+            const reminderDate = new Date();
+            reminderDate.setHours(hours, minutes, 0, 0);
+            
+            // Check if current time is within 2 minutes of reminder time
+            const timeDiff = Math.abs(now - reminderDate);
+            const twoMinutes = 2 * 60 * 1000;
+            
+            if (timeDiff <= twoMinutes) {
+                // Fetch motivation message
+                fetch('/api/daily-motivation')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Show browser notification
+                        const notification = new Notification('💜 CystaSense Daily Check-in', {
+                            body: data.message,
+                            icon: '{{ url_for("static", filename="images/cystasense-logo.png") }}',
+                            badge: data.icon,
+                            requireInteraction: true,
+                            tag: 'daily-reminder'
+                        });
+
+                        // Mark as shown for today
+                        localStorage.setItem('lastReminderShown', today);
+
+                        // Click handler - open dashboard
+                        notification.onclick = function() {
+                            window.focus();
+                            window.location.href = '/tracker';
+                            notification.close();
+                        };
+                    })
+                    .catch(error => console.error('Error fetching motivation:', error));
+            }
+        }
+
+        // Check reminder every minute
+        checkDailyReminder();
+        setInterval(checkDailyReminder, 60000); // Check every minute
+    </script>
+    {% endif %}
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

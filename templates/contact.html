@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4 text-center">
+                <i class="bi bi-envelope text-primary"></i> Contact Us
+            </h1>
+            <p class="text-center text-muted mb-5">We're here to help! Reach out to us with any questions or concerns.</p>
+            
+            <div class="row g-4 mb-5">
+                <!-- Support Email -->
+                <div class="col-md-6">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="bi bi-envelope-at fs-1 text-primary mb-3"></i>
+                            <h5 class="card-title">Email Support</h5>
+                            <p class="text-muted">For general inquiries and support</p>
+                            <a href="mailto:support@cystasense.com" class="btn btn-outline-primary">support@cystasense.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Technical Support -->
+                <div class="col-md-6">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="bi bi-tools fs-1 text-primary mb-3"></i>
+                            <h5 class="card-title">Technical Support</h5>
+                            <p class="text-muted">For technical issues and bugs</p>
+                            <a href="mailto:tech@cystasense.com" class="btn btn-outline-primary">tech@cystasense.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Privacy & Security -->
+                <div class="col-md-6">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="bi bi-shield-lock fs-1 text-primary mb-3"></i>
+                            <h5 class="card-title">Privacy & Security</h5>
+                            <p class="text-muted">For data privacy concerns</p>
+                            <a href="mailto:privacy@cystasense.com" class="btn btn-outline-primary">privacy@cystasense.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Help Center -->
+                <div class="col-md-6">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="bi bi-question-circle fs-1 text-primary mb-3"></i>
+                            <h5 class="card-title">Help Center</h5>
+                            <p class="text-muted">Find answers to common questions</p>
+                            <a href="{{ url_for('help_center') }}" class="btn btn-outline-primary">Visit Help Center</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Send us a Message</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('contact') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="contactName" class="form-label">Your Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="contactName" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactEmail" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="contactEmail" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactSubject" class="form-label">Subject <span class="text-danger">*</span></label>
+                            <select class="form-select" id="contactSubject" name="subject" required>
+                                <option value="">Choose a topic...</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Technical Issue">Technical Issue</option>
+                                <option value="Account Help">Account Help</option>
+                                <option value="Privacy Concern">Privacy Concern</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactMessage" class="form-label">Message <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="contactMessage" name="message" rows="5" required></textarea>
+                            <small class="text-muted">Please provide as much detail as possible so we can help you better.</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-send"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Response Time -->
+            <div class="alert alert-success mt-4">
+                <i class="bi bi-clock"></i> <strong>Response Time:</strong> We typically respond within 24-48 hours during business days.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

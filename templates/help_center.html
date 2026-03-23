@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block title %}Help Center - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h1 class="mb-4 text-center">
+                <i class="bi bi-question-circle text-primary"></i> Help Center
+            </h1>
+            <p class="text-center text-muted mb-5">Click any question to see the answer</p>
+            
+            <div class="row g-4">
+                <!-- Getting Started -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-rocket-takeoff text-primary"></i> Getting Started
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="how-to-register">
+                                        How do I create an account?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="login-issues">
+                                        I can't log in, what should I do?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="onboarding">
+                                        What is the onboarding process?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="roles">
+                                        What's the difference between PCOS User and Family Supporter?
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Symptom Tracking -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-clipboard-pulse text-primary"></i> Symptom Tracking
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="track-symptoms">
+                                        How do I track my symptoms?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="severity-scale">
+                                        What do the severity levels mean?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="health-score">
+                                        How is my health score calculated?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="view-analytics">
+                                        Where can I see my progress?
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Learning Tracks -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-book text-primary"></i> Learning Tracks
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="tracks">
+                                        What learning tracks are available?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="lessons">
+                                        How do I complete a lesson?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="quizzes">
+                                        Do I need to pass the quizzes?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="family-support">
+                                        Can family members take courses?
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Family Support -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-people text-primary"></i> Family Support (CheerUp Buddy)
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="connect">
+                                        How do I connect with a family supporter?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="permissions">
+                                        What can supporters see?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="messages">
+                                        How do I send messages?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="nudges">
+                                        What are nudges and motivation tools?
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Community Forum -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-chat-square-dots text-primary"></i> Community Forum
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="forum-post">
+                                        How do I create a forum post?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="categories">
+                                        What categories are available?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="reactions">
+                                        How do reactions work?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="privacy">
+                                        Is the forum private?
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account & Settings -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-gear text-primary"></i> Account & Settings
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="update-profile">
+                                        How do I update my profile?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="switch-role">
+                                        Can I switch between roles?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="delete-account">
+                                        How do I delete my account?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="faq-link" data-question="reminders">
+                                        How do I set up reminders?
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Answer Display Area -->
+            <div id="answerArea" class="mt-5" style="display: none;">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" id="answerQuestion">
+                            <i class="bi bi-lightbulb"></i> <span id="questionText"></span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" id="closeAnswer"></button>
+                    </div>
+                    <div class="card-body">
+                        <div id="answerContent" class="lead"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Still Need Help -->
+            <div class="alert alert-info mt-4 text-center">
+                <h5><i class="bi bi-headset"></i> Still need help?</h5>
+                <p class="mb-2">Can't find what you're looking for?</p>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">Contact Support</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// FAQ answers database
+const faqAnswers = {
+    'how-to-register': {
+        question: 'How do I create an account?',
+        answer: `Creating an account is simple! Click the "Register" button in the navigation bar. Fill in your email, choose a secure password, and provide your name and date of birth. After registering, you'll go through a quick 4-step onboarding process where you'll select your role (PCOS User or Family Supporter), review consent information, complete your profile, and set accessibility preferences.`
+    },
+    'login-issues': {
+        question: "I can't log in, what should I do?",
+        answer: `If you're having trouble logging in, try these steps:<br><br>
+        <ul>
+            <li><strong>Check your email:</strong> Make sure you're using the exact email address you registered with (watch for typos like .co vs .com)</li>
+            <li><strong>Password is case-sensitive:</strong> Ensure Caps Lock is off and you're using the correct capitalization</li>
+            <li><strong>Use the password visibility toggle:</strong> Click the eye icon to verify you're typing the correct password</li>
+            <li><strong>Clear your browser cache:</strong> Sometimes old session data can cause issues</li>
+            <li><strong>Try a different browser:</strong> If problems persist, try logging in with a different browser</li>
+        </ul>
+        If you still can't log in, contact us at <a href="mailto:support@cystasense.com">support@cystasense.com</a>.`
+    },
+    'onboarding': {
+        question: 'What is the onboarding process?',
+        answer: `After registering, you'll complete a 4-step onboarding process:<br><br>
+        <ol>
+            <li><strong>Role Selection:</strong> Choose whether you're a PCOS User managing your own health or a Family Supporter helping a loved one</li>
+            <li><strong>Consent Management:</strong> Review and agree to our terms of service and privacy policy</li>
+            <li><strong>Profile Capture:</strong> Provide health information (height, weight, medical history) for personalized insights</li>
+            <li><strong>Accessibility Preferences:</strong> Set your communication and display preferences</li>
+        </ol>
+        This helps us customize your experience based on your needs!`
+    },
+    'roles': {
+        question: "What's the difference between PCOS User and Family Supporter?",
+        answer: `<strong>PCOS User:</strong> This role is for individuals managing PCOS. You'll have access to symptom tracking, cycle tracking, health analytics, learning tracks, community forum, and specialist directory. You can connect with family supporters and control what they can see.<br><br>
+        <strong>Family Supporter:</strong> This role is for family members, partners, or friends who want to support someone with PCOS. You'll take the Family Support Essentials course, can connect with PCOS users (with their permission), send motivational messages, and view shared health goals. You can switch between roles at any time from your profile settings.`
+    },
+    'track-symptoms': {
+        question: 'How do I track my symptoms?',
+        answer: `Navigate to the "Tracker" page from your dashboard. You'll see a tabbed interface with different categories:<br><br>
+        <ul>
+            <li><strong>Quick Log:</strong> Use quick-log buttons for common symptoms</li>
+            <li><strong>Hormonal:</strong> Track hormone-related symptoms (irregular periods, acne, hair growth)</li>
+            <li><strong>Metabolic:</strong> Monitor weight changes, insulin resistance, energy levels</li>
+            <li><strong>Mental Health:</strong> Record mood, anxiety, sleep quality</li>
+            <li><strong>Physical:</strong> Log pain, fatigue, and other physical symptoms</li>
+        </ul>
+        For each symptom, rate the severity from 0 (none) to 5 (severe), add optional notes, and save. Your entries will be used to calculate your health score and show progress over time.`
+    },
+    'severity-scale': {
+        question: 'What do the severity levels mean?',
+        answer: `We use a 0-5 severity scale for tracking symptoms:<br><br>
+        <ul>
+            <li><strong>0 - None:</strong> No symptoms present</li>
+            <li><strong>1 - Minimal:</strong> Barely noticeable, doesn't affect daily life</li>
+            <li><strong>2 - Mild:</strong> Noticeable but manageable</li>
+            <li><strong>3 - Moderate:</strong> Somewhat bothersome, affects some activities</li>
+            <li><strong>4 - Severe:</strong> Significantly impacts daily activities</li>
+            <li><strong>5 - Very Severe:</strong> Extremely bothersome, major impact on quality of life</li>
+        </ul>
+        Be honest in your ratings - this helps us provide better insights and track your progress accurately.`
+    },
+    'health-score': {
+        question: 'How is my health score calculated?',
+        answer: `Your health score is calculated based on your last 10 symptom entries across 5 severity factors. The score ranges from 0-5:<br><br>
+        <ul>
+            <li><strong>Excellent 🌟:</strong> 4.5-5.0 - Great symptom management</li>
+            <li><strong>Very Good 💪:</strong> 3.5-4.4 - Good progress, keep it up</li>
+            <li><strong>Good 😊:</strong> 2.5-3.4 - Steady improvement</li>
+            <li><strong>Fair ⚠️:</strong> 1.5-2.4 - Room for improvement</li>
+            <li><strong>Poor 🚨:</strong> 0-1.4 - Needs attention, seek support</li>
+        </ul>
+        Lower symptom severity results in a higher health score. Track consistently for the most accurate results!`
+    },
+    'view-analytics': {
+        question: 'Where can I see my progress?',
+        answer: `Visit the "Analytics" page from your dashboard to see:<br><br>
+        <ul>
+            <li><strong>Health Score:</strong> Your current score with detailed feedback</li>
+            <li><strong>Symptom Trends:</strong> Charts showing how your symptoms have changed over time</li>
+            <li><strong>Cycle Tracking:</strong> Visual representation of your menstrual cycle patterns</li>
+            <li><strong>Personalized Insights:</strong> Color-coded feedback with actionable suggestions</li>
+        </ul>
+        The more consistently you track, the better insights you'll get!`
+    },
+    'tracks': {
+        question: 'What learning tracks are available?',
+        answer: `We offer 8 comprehensive learning tracks:<br><br>
+        <ol>
+            <li><strong>Getting Started with PCOS:</strong> Basics and diagnosis</li>
+            <li><strong>Food Foundations:</strong> Nutrition and diet planning</li>
+            <li><strong>Movement Matters:</strong> Exercise for PCOS management</li>
+            <li><strong>Sleep & Stress:</strong> Managing stress and improving sleep</li>
+            <li><strong>Skin & Hair Care:</strong> Managing visible PCOS symptoms</li>
+            <li><strong>Fertility & Pregnancy:</strong> Reproductive health guidance</li>
+            <li><strong>Medications Literacy:</strong> Understanding treatment options</li>
+            <li><strong>Family Support Essentials:</strong> For supporters (60-minute micro-course)</li>
+        </ol>
+        Each track contains multiple lessons with videos, action steps, and quizzes.`
+    },
+    'lessons': {
+        question: 'How do I complete a lesson?',
+        answer: `Each lesson follows this structure:<br><br>
+        <ol>
+            <li><strong>Introduction:</strong> Learn "why it matters"</li>
+            <li><strong>Video Content:</strong> Watch educational video (YouTube embedded)</li>
+            <li><strong>Action Steps:</strong> Read 3-5 practical action steps</li>
+            <li><strong>Quiz:</strong> Take a short quiz to test your knowledge</li>
+            <li><strong>Conversation Prompt:</strong> Reflect or discuss with supporters</li>
+        </ol>
+        Mark the lesson as complete once you've finished all sections. Your progress is saved automatically!`
+    },
+    'quizzes': {
+        question: 'Do I need to pass the quizzes?',
+        answer: `Quizzes are designed to reinforce learning, not to test you strictly. You can take quizzes multiple times, and your score is saved. There's no minimum passing score required to progress - the goal is to help you understand the material better. If you score low, we encourage you to review the lesson content and try again!`
+    },
+    'family-support': {
+        question: 'Can family members take courses?',
+        answer: `Absolutely! Family supporters have access to the <strong>Family Support Essentials</strong> track, which is a 60-minute crash course designed specifically for supporters. It teaches:<br><br>
+        <ul>
+            <li>What PCOS is and how it affects loved ones</li>
+            <li>How to provide emotional support</li>
+            <li>Communication dos and don'ts</li>
+            <li>Practical ways to help with lifestyle changes</li>
+            <li>Understanding treatment options</li>
+        </ul>
+        Supporters can also access all 7 PCOS tracks if they want to learn more!`
+    },
+    'connect': {
+        question: 'How do I connect with a family supporter?',
+        answer: `<strong>For PCOS Users:</strong> You'll receive connection requests from family supporters via email. Go to "My Connections" to accept/reject requests and set permissions.<br><br>
+        <strong>For Family Supporters:</strong> Navigate to "My Connections" and click "Request New Connection". Enter the PCOS user's email address, and they'll receive a notification to accept your request. Once accepted, you can view their shared health data based on the permissions they grant you.`
+    },
+    'permissions': {
+        question: 'What can supporters see?',
+        answer: `Family supporters can ONLY see what PCOS users give them permission to see. There are three permission levels:<br><br>
+        <ul>
+            <li><strong>View Goals:</strong> Supporters can see your health goals and progress</li>
+            <li><strong>View Symptoms:</strong> Supporters can see your symptom tracking data and health score</li>
+            <li><strong>Send Nudges:</strong> Supporters can send motivational messages and nudge templates</li>
+        </ul>
+        PCOS users control all permissions and can modify them at any time. Supporters can never access full health data without explicit consent.`
+    },
+    'messages': {
+        question: 'How do I send messages?',
+        answer: `Navigate to "My Connections" and click "View Chat" next to a connection. You'll see a WhatsApp-style chat interface where you can:<br><br>
+        <ul>
+            <li><strong>Send text messages:</strong> Type in the message box (up to 500 characters) and click send</li>
+            <li><strong>Use nudge templates:</strong> Click "Send Nudge" to choose from 11+ pre-written templates (encouragement, recipe tips, walk invites, reminders, celebrations)</li>
+            <li><strong>React to messages:</strong> Like or dislike any message with thumbs up/down reactions</li>
+            <li><strong>View message types:</strong> Each message shows a type badge (💜 Encouragement, ⏰ Reminder, 🍳 Recipe, etc.)</li>
+        </ul>
+        All active connections can send regular chat messages regardless of permissions. Only nudge templates require the "send nudges" permission.`
+    },
+    'nudges': {
+        question: 'What are nudges and motivation tools?',
+        answer: `Nudges are pre-written motivational message templates that supporters can send with one click. Categories include:<br><br>
+        <ul>
+            <li><strong>Encouragement:</strong> Uplifting messages for tough days</li>
+            <li><strong>Recipe Swaps:</strong> Healthy food suggestions</li>
+            <li><strong>Activity Invites:</strong> Walk/exercise invitations</li>
+            <li><strong>Medication Reminders:</strong> Gentle reminders for medications/supplements</li>
+            <li><strong>Celebrations:</strong> Celebrating small wins and progress</li>
+        </ul>
+        Supporters need the "send nudges" permission to use templates, but can always send regular chat messages!`
+    },
+    'forum-post': {
+        question: 'How do I create a forum post?',
+        answer: `Navigate to the "Forum" page and click "Create New Post". Choose a category, write a compelling title, and share your thoughts in the content area. You can edit your own posts anytime by clicking the "Edit" button. Posts can receive likes, dislikes, and replies from the community!`
+    },
+    'categories': {
+        question: 'What categories are available?',
+        answer: `Our forum has 9 categories to cover all aspects of PCOS life:<br><br>
+        <ol>
+            <li><strong>Causes & Diagnosis:</strong> Understanding PCOS</li>
+            <li><strong>Fertility & Pregnancy:</strong> TTC and pregnancy support</li>
+            <li><strong>Periods & Cycles:</strong> Menstrual health discussions</li>
+            <li><strong>Skin & Hair:</strong> Managing visible symptoms</li>
+            <li><strong>Long-term Health:</strong> Managing diabetes, heart health</li>
+            <li><strong>Treatments & Medications:</strong> Treatment discussions</li>
+            <li><strong>Relationships & Support:</strong> Partner/family dynamics</li>
+            <li><strong>Body Image & Mental Health:</strong> Emotional wellbeing</li>
+            <li><strong>Inspirational Stories:</strong> Success stories and hope</li>
+        </ol>`
+    },
+    'reactions': {
+        question: 'How do reactions work?',
+        answer: `You can react to posts and replies with:<br><br>
+        <ul>
+            <li><strong>Like (👍):</strong> Show support or agreement</li>
+            <li><strong>Dislike (👎):</strong> Express disagreement (use respectfully)</li>
+        </ul>
+        Reactions are anonymous, and the total count is displayed. You can only react once per post/reply, but you can change your reaction at any time. Your own reactions are visually highlighted for easy identification.`
+    },
+    'privacy': {
+        question: 'Is the forum private?',
+        answer: `The forum is visible to all registered CystaSense users. Your posts show your name but not your full health data. We recommend:<br><br>
+        <ul>
+            <li>Using discretion when sharing personal health information</li>
+            <li>Avoiding sharing identifying information (full name, location, etc.)</li>
+            <li>Being respectful and supportive of all community members</li>
+            <li>Reporting any inappropriate content to our moderators</li>
+        </ul>
+        You can delete your own posts at any time, which will also remove all associated replies and reactions.`
+    },
+    'update-profile': {
+        question: 'How do I update my profile?',
+        answer: `Navigate to your "Profile" page from the navigation menu. Here you can update:<br><br>
+        <ul>
+            <li>Personal information (age, height, weight)</li>
+            <li>Contact details (phone number, emergency contact)</li>
+            <li>Medical history and health goals</li>
+            <li>Account role (PCOS User or Family Supporter)</li>
+        </ul>
+        Click "Save Changes" after making any updates. Your profile data is used to provide personalized insights and recommendations.`
+    },
+    'switch-role': {
+        question: 'Can I switch between roles?',
+        answer: `Yes! You can easily switch between PCOS User and Family Supporter roles from your Profile page. Look for the "Account Role" card and click "Switch Role". A confirmation modal will explain the benefits of each role.<br><br>
+        <strong>Important:</strong> ALL your data is preserved when switching roles - connections, messages, symptom history, and goals remain intact and accessible when you switch back. After switching, you'll be automatically redirected to the appropriate dashboard for your new role.`
+    },
+    'delete-account': {
+        question: 'How do I delete my account?',
+        answer: `If you wish to delete your account, please contact us at <a href="mailto:privacy@cystasense.com">privacy@cystasense.com</a>. We'll verify your identity and process your deletion request within 7 business days.<br><br>
+        <strong>Note:</strong> Account deletion is permanent and will remove all your health data, forum posts, connections, and messages. Please download any data you want to keep before requesting deletion.`
+    },
+    'reminders': {
+        question: 'How do I set up reminders?',
+        answer: `Navigate to the "Reminders" page from your dashboard. You can set up reminders for:<br><br>
+        <ul>
+            <li><strong>Medications:</strong> Daily medication schedules</li>
+            <li><strong>Symptoms:</strong> Regular symptom tracking reminders</li>
+            <li><strong>Exercise:</strong> Workout and activity reminders</li>
+            <li><strong>Appointments:</strong> Doctor visit reminders</li>
+            <li><strong>Meals:</strong> Healthy eating reminders</li>
+        </ul>
+        Use the quick-setup buttons for common reminders, or create custom ones. You can search, filter, and manage all your reminders in one place!`
+    }
+};
+
+// Handle FAQ link clicks
+document.addEventListener('DOMContentLoaded', function() {
+    const faqLinks = document.querySelectorAll('.faq-link');
+    const answerArea = document.getElementById('answerArea');
+    const questionText = document.getElementById('questionText');
+    const answerContent = document.getElementById('answerContent');
+    const closeAnswer = document.getElementById('closeAnswer');
+    
+    faqLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const questionKey = this.getAttribute('data-question');
+            const faqData = faqAnswers[questionKey];
+            
+            if (faqData) {
+                // Display the answer
+                questionText.textContent = faqData.question;
+                answerContent.innerHTML = faqData.answer;
+                answerArea.style.display = 'block';
+                
+                // Scroll to answer
+                answerArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+    
+    // Close answer button
+    closeAnswer.addEventListener('click', function() {
+        answerArea.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}

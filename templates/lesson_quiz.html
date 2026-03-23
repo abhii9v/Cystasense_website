@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz: {{ lesson.title }} - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('learn') }}">Learn</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('lesson', lesson_id=lesson.id) }}">{{ lesson.title }}</a></li>
+            <li class="breadcrumb-item active">Quiz</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-teal text-white">
+                    <h4 class="mb-0"><i class="bi bi-question-circle"></i> {{ quiz.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <form id="quizForm">
+                        {% for question in questions %}
+                        <div class="mb-4">
+                            <h6 class="fw-bold">Question {{ loop.index }}</h6>
+                            <p>{{ question.text }}</p>
+                            
+                            <div class="list-group">
+                                {% for option in question.options %}
+                                <label class="list-group-item">
+                                    <input class="form-check-input me-2" type="radio" 
+                                           name="question_{{ question.id }}" 
+                                           value="{{ option }}" required>
+                                    {{ option }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-teal btn-lg">
+                                <i class="bi bi-check-circle"></i> Submit Quiz
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="quizResults" class="mt-4" style="display: none;">
+                        <div class="alert" role="alert">
+                            <h5 class="alert-heading">Quiz Results</h5>
+                            <p id="scoreText"></p>
+                            <hr>
+                            <p class="mb-0" id="feedbackText"></p>
+                        </div>
+                        
+                        <!-- Professional Navigation - Same line Previous/Next -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            {% if prev_lesson %}
+                            <a href="{{ url_for('lesson', lesson_id=prev_lesson.id) }}" class="btn btn-outline-indigo">
+                                <i class="bi bi-arrow-left"></i> Previous Lesson
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('track_detail', track_id=lesson.track.id) }}" class="btn btn-outline-indigo">
+                                <i class="bi bi-arrow-left"></i> Back to Track
+                            </a>
+                            {% endif %}
+                            
+                            {% if next_lesson %}
+                            <a href="{{ url_for('lesson', lesson_id=next_lesson.id) }}" class="btn btn-indigo">
+                                Next Lesson <i class="bi bi-arrow-right"></i>
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('track_detail', track_id=lesson.track.id) }}" class="btn btn-indigo">
+                                <i class="bi bi-check-circle"></i> Complete Track
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('quizForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const answers = {};
+    
+    for (let [key, value] of formData.entries()) {
+        answers[key] = value;
+    }
+    
+    try {
+        const response = await fetch('{{ url_for("lesson_quiz", lesson_id=lesson.id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify(answers)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            const resultsDiv = document.getElementById('quizResults');
+            const alertDiv = resultsDiv.querySelector('.alert');
+            const scoreText = document.getElementById('scoreText');
+            const feedbackText = document.getElementById('feedbackText');
+            
+            scoreText.textContent = `You scored ${result.score}% (${result.correct}/${result.total} correct)`;
+            
+            if (result.passed) {
+                alertDiv.className = 'alert alert-success';
+                feedbackText.innerHTML = '<i class="bi bi-check-circle"></i> Congratulations! You passed!';
+            } else {
+                alertDiv.className = 'alert alert-warning';
+                feedbackText.innerHTML = `<i class="bi bi-x-circle"></i> You need ${result.passing_score}% to pass. Try again!`;
+            }
+            
+            this.style.display = 'none';
+            resultsDiv.style.display = 'block';
+        }
+    } catch (error) {
+        alert('Failed to submit quiz. Please try again.');
+    }
+});
+</script>
+
+<style>
+.bg-teal { background-color: #14b8a6 !important; }
+.btn-teal { background-color: #14b8a6; color: white; }
+.btn-teal:hover { background-color: #0f9b8e; color: white; }
+.btn-indigo { 
+    background-color: #6610f2; 
+    color: white; 
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+}
+.btn-indigo:hover { 
+    background-color: #5208d4; 
+    color: white; 
+}
+.btn-outline-indigo {
+    background-color: transparent;
+    color: #6610f2;
+    border: 2px solid #6610f2;
+    padding: 10px 20px;
+    font-weight: 500;
+}
+.btn-outline-indigo:hover {
+    background-color: #6610f2;
+    color: white;
+    border-color: #6610f2;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Learn - CystaSense{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('learn') }}">
+                            <i class="bi bi-book"></i> Learn
+                        </a>
+                    </li>
+                    {% if current_user.user_role == 'pcos_user' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('family_connections') }}">
+                            <i class="bi bi-people"></i> Family Support
+                        </a>
+                    </li>
+                    {% elif current_user.user_role == 'family_member' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('family_connections') }}">
+                            <i class="bi bi-people"></i> My Connections
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-book text-indigo"></i> 
+                    {% if current_user.user_role == 'family_member' %}
+                    Family Support Learning
+                    {% else %}
+                    Your Learning Journey
+                    {% endif %}
+                </h1>
+            </div>
+
+            {% if current_user.user_role == 'family_member' %}
+            <!-- Welcome banner for supporters -->
+            <div class="alert alert-info mb-4">
+                <h5><i class="bi bi-heart-fill"></i> Welcome, Family Supporter!</h5>
+                <p class="mb-2">Thank you for supporting your loved one with PCOS. This learning track will help you:</p>
+                <ul class="mb-0">
+                    <li>Understand PCOS and its impact (short videos and practical tips)</li>
+                    <li>Learn dos and don'ts for effective support</li>
+                    <li>Connect with your loved one through their <strong>Supporter Dashboard</strong></li>
+                    <li>Send encouraging nudges (with their permission)</li>
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Educational Tracks -->
+            <div class="row g-4">
+                {% for track in tracks %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm hover-shadow">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi {{ track.icon }} fs-3 text-teal me-3"></i>
+                                <div>
+                                    <h5 class="card-title mb-0">{{ track.title }}</h5>
+                                    {% if track.duration_weeks %}
+                                    <span class="badge bg-indigo mt-1">
+                                        <i class="bi bi-calendar-week"></i> {{ track.duration_weeks }} Week Module
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="card-text text-muted">{{ track.description }}</p>
+                            
+                            <!-- Lessons count -->
+                            {% set progress = track_progress[track.id] %}
+                            <div class="mb-2">
+                                <i class="bi bi-journal-text text-indigo"></i>
+                                <small class="text-muted ms-1">{{ progress.total }} Lessons with Quizzes</small>
+                            </div>
+                            
+                            <!-- Progress bar -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold text-muted">Your Progress</small>
+                                    <small class="text-muted">{{ progress.completed }}/{{ progress.total }} completed</small>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-gradient" style="width: {{ progress.percentage }}%; background: linear-gradient(90deg, #14b8a6 0%, #6610f2 100%);" 
+                                         role="progressbar" 
+                                         aria-valuenow="{{ progress.percentage }}" 
+                                         aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            
+                            <a href="{{ url_for('track_detail', track_id=track.id) }}" class="btn btn-indigo btn-sm w-100">
+                                {% if progress.completed > 0 %}Continue Learning{% else %}Start Track{% endif %}
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if tracks|length == 0 %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                <p class="text-muted mt-3">No learning tracks available at this time.</p>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<style>
+.hover-shadow {
+    transition: box-shadow 0.3s ease;
+}
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.bg-teal {
+    background-color: #14b8a6 !important;
+}
+.text-teal {
+    color: #14b8a6 !important;
+}
+.text-indigo {
+    color: #6610f2 !important;
+}
+.btn-indigo {
+    background-color: #6610f2;
+    color: white;
+}
+.btn-indigo:hover {
+    background-color: #5208d4;
+    color: white;
+}
+</style>
+{% endblock %}
