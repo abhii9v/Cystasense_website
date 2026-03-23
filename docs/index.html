@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CystaSense - Comprehensive Women's Health Management</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #6610f2;
+            --secondary-color: #d1c4f9;
+            --accent-color: #14b8a6;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            text-decoration: none !important;
+        }
+
+        .brand-text {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-symbol {
+            display: flex;
+            align-items: center;
+            font-size: 2.2rem;
+            position: relative;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #520dc2;
+            border-color: #520dc2;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 80px 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+        .demo-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Notice -->
+    <div class="demo-notice">
+        <div class="container">
+            <i class="bi bi-info-circle"></i> This is a static demo page. The full application requires a backend server.
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <span class="logo-symbol">
+                    <i class="bi bi-heart-pulse-fill" style="color: #14b8a6;"></i>
+                    <i class="bi bi-person-hearts" style="color: var(--primary-color); margin-left: -8px;"></i>
+                </span>
+                <span class="brand-text">CystaSense</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">
+                            <i class="bi bi-book"></i> Learn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">
+                            <i class="bi bi-info-circle"></i> About
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3" href="https://github.com/abhii9v/Cystasense_website" target="_blank">
+                            <i class="bi bi-github"></i> View on GitHub
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold mb-4">Welcome to CystaSense. Learn from your body and embrace balance.</h1>
+                        <p class="lead mb-4">
+                            Comprehensive platform for PCOD/PCOS management with symptom tracking,
+                            educational resources, diet planning, and access to verified specialists.
+                        </p>
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="https://github.com/abhii9v/Cystasense_website" class="btn btn-light btn-lg px-4 me-md-2" target="_blank">
+                                <i class="bi bi-github"></i> Get Started Free
+                            </a>
+                            <a href="#features" class="btn btn-outline-light btn-lg px-4">
+                                <i class="bi bi-book"></i> Learn More
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="text-center">
+                            <i class="bi bi-heart-pulse display-1 text-white opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <h2 class="fw-bold text-primary">1 in 10</h2>
+                            <p class="text-muted">Women affected by PCOD worldwide</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <h2 class="fw-bold text-primary">80%</h2>
+                            <p class="text-muted">Improvement with proper management</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <h2 class="fw-bold text-primary">24/7</h2>
+                            <p class="text-muted">Access to your health data</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <h2 class="fw-bold text-primary">100%</h2>
+                            <p class="text-muted">Privacy and security guaranteed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-5" id="features">
+            <div class="container">
+                <div class="row g-4">
+                    <!-- Awareness Module -->
+                    <div class="col-md-4">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="bi bi-book text-primary" style="font-size: 3rem;"></i>
+                                </div>
+                                <h5 class="card-title">Education & Awareness</h5>
+                                <p class="card-text">
+                                    Access evidence-based articles, FAQs, lifestyle tips, and self-assessment quizzes
+                                    to understand PCOD better and make informed decisions.
+                                </p>
+                                <ul class="list-unstyled text-start">
+                                    <li><i class="bi bi-check-circle text-success"></i> Educational resources</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Interactive quizzes</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Lifestyle tips</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Learn Along Your Path</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Self-Management Module -->
+                    <div class="col-md-4">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="bi bi-graph-up text-primary" style="font-size: 3rem;"></i>
+                                </div>
+                                <h5 class="card-title">Smart Tracking & Analytics</h5>
+                                <p class="card-text">
+                                    Track symptoms, menstrual cycles, diet, exercise, and get personalized
+                                    insights with advanced analytics and helpful reminders.
+                                </p>
+                                <ul class="list-unstyled text-start">
+                                    <li><i class="bi bi-check-circle text-success"></i> Symptom tracking</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Cycle monitoring</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Diet & exercise planning</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Smart reminders</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secure Communications Module -->
+                    <div class="col-md-4">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="bi bi-chat-dots text-primary" style="font-size: 3rem;"></i>
+                                </div>
+                                <h5 class="card-title">Secure Communications</h5>
+                                <p class="card-text">
+                                    Our researchers and clinicians have investigated PCOS intensively. In our discussion forum, speak to other women, our researchers and clinicians about the topics that matter to you.
+                                </p>
+                                <ul class="list-unstyled text-start">
+                                    <li><i class="bi bi-check-circle text-success"></i> Community forum</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Secure connections</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Verified specialists</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="py-5 bg-light" id="about">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="fw-bold mb-4 text-center">About CystaSense</h2>
+                        <p class="lead text-center mb-4">
+                            CystaSense is a comprehensive web application designed to help women manage Polycystic Ovary Syndrome (PCOS/PCOD).
+                        </p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="bi bi-check-circle-fill text-success"></i> Key Features</h5>
+                                <ul>
+                                    <li>Symptom & cycle tracking with analytics</li>
+                                    <li>Educational learning tracks (7 PCOS tracks)</li>
+                                    <li>AI-powered health assistant</li>
+                                    <li>Community forum with categories</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="bi bi-shield-check-fill text-primary"></i> Your Privacy</h5>
+                                <ul>
+                                    <li>HIPAA compliant</li>
+                                    <li>Secure data encryption</li>
+                                    <li>Role-based access control</li>
+                                    <li>Family support system</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <h2 class="fw-bold mb-4">Ready to Take Control of Your Health?</h2>
+                        <p class="lead mb-4">
+                            Join thousands of women who are successfully managing their PCOD with our comprehensive platform.
+                        </p>
+                        <a href="https://github.com/abhii9v/Cystasense_website" class="btn btn-primary btn-lg px-5" target="_blank">
+                            <i class="bi bi-github"></i> Start Your Journey Today
+                        </a>
+                        <p class="mt-3 text-muted">
+                            <small><i class="bi bi-shield-check"></i> HIPAA Compliant • Secure • Free to Start</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-heart-pulse"></i> CystaSense</h5>
+                    <p>Comprehensive women's health management platform for PCOD/PCOS support.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Resources</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="https://github.com/abhii9v/Cystasense_website" class="text-light" target="_blank">GitHub Repository</a></li>
+                        <li><a href="https://github.com/abhii9v/Cystasense_website#readme" class="text-light" target="_blank">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Technology</h6>
+                    <ul class="list-unstyled">
+                        <li class="text-light">Flask & Python</li>
+                        <li class="text-light">Bootstrap 5</li>
+                        <li class="text-light">SQLAlchemy</li>
+                        <li class="text-light">OpenAI Integration</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2025 CystaSense. Designed for women's health and wellness.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
