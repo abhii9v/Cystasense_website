@@ -2,6 +2,31 @@
 
 This document explains how to deploy the CystaSense landing page to GitHub Pages.
 
+## 🚀 Quick Start - Deploy in 3 Steps
+
+### ⚠️ IMPORTANT: GitHub Pages Must Be Enabled First!
+
+The deployment workflow is ready but **will fail until GitHub Pages is enabled** in repository settings.
+
+### Step 1: Enable GitHub Pages (REQUIRED!)
+1. Go to your GitHub repository: `https://github.com/abhii9v/Cystasense_website`
+2. Click on **Settings** (top menu)
+3. Click on **Pages** in the left sidebar (under "Code and automation")
+4. Under "Build and deployment":
+   - **Source**: Select **"GitHub Actions"** (NOT "Deploy from a branch")
+5. Click Save
+
+### Step 2: Deploy the Site
+**After enabling Pages**, either:
+- **Option A**: Merge any branch to `main` - workflow auto-runs
+- **Option B**: Go to Actions tab → "Deploy to GitHub Pages" → "Run workflow"
+
+### Step 3: Access Your Site
+- Your site will be live at: `https://abhii9v.github.io/Cystasense_website/`
+- First deployment takes 1-2 minutes
+
+---
+
 ## What Has Been Set Up
 
 1. **Static Landing Page** (`docs/index.html`)
@@ -13,26 +38,7 @@ This document explains how to deploy the CystaSense landing page to GitHub Pages
 2. **GitHub Actions Workflow** (`.github/workflows/deploy.yml`)
    - Automatically deploys the `docs/` directory to GitHub Pages
    - Triggers on pushes to the `main` branch
-   - Can also be manually triggered
-
-## How to Enable GitHub Pages
-
-To complete the deployment, you need to enable GitHub Pages in your repository settings:
-
-### Step 1: Navigate to Repository Settings
-1. Go to your GitHub repository: `https://github.com/abhii9v/Cystasense_website`
-2. Click on **Settings** (top menu)
-3. Click on **Pages** in the left sidebar (under "Code and automation")
-
-### Step 2: Configure GitHub Pages
-1. Under "Build and deployment":
-   - **Source**: Select "GitHub Actions"
-2. Save the settings
-
-### Step 3: Merge This Branch
-1. Merge this branch (`claude/deploy-to-github-pages`) into your `main` branch
-2. The GitHub Actions workflow will automatically run
-3. Your site will be deployed to: `https://abhii9v.github.io/Cystasense_website/`
+   - Can also be manually triggered via workflow_dispatch
 
 ## Workflow Explanation
 
