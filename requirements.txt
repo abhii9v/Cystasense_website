@@ -12,6 +12,7 @@ authlib>=1.6.4
 oauthlib>=3.3.1
 pyjwt[crypto]>=2.10.1
 python-dateutil>=2.9.0.post0
+python-dotenv>=1.0.0
 requests>=2.32.5
 pillow>=11.3.0
 crawl4ai>=0.7.8

@@ -28,6 +28,15 @@ Make sure the following are installed on your machine before starting:
 
 ---
 
+## Quick Start Options
+
+Choose your preferred database:
+
+- **🚀 Quick Start (SQLite)** - Continue with steps below for instant setup
+- **💾 PostgreSQL Setup** - See [POSTGRES_SETUP.md](POSTGRES_SETUP.md) for detailed PostgreSQL configuration and how to use your SQL dump file
+
+---
+
 ## Step-by-Step Local Setup
 
 ### Step 1: Clone the Repository
@@ -77,13 +86,13 @@ This installs Flask, SQLAlchemy, OpenAI, and all other required packages.
 
 ### Step 4: Set Up Environment Variables
 
-Create a `.env` file in the root of the project directory:
+Copy the example environment file and configure it:
 
 ```bash
-touch .env
+cp .env.example .env
 ```
 
-Open `.env` and add the following:
+Edit the `.env` file and set your configuration:
 
 ```env
 # Required — used to sign sessions and cookies. Use any long random string.
@@ -105,6 +114,8 @@ FLASK_ENV=development
 > python -c "import secrets; print(secrets.token_hex(32))"
 > ```
 > Copy the output and paste it as the value for `SESSION_SECRET`.
+
+> **PostgreSQL Users:** See [POSTGRES_SETUP.md](POSTGRES_SETUP.md) for detailed instructions on using your SQL dump file with PostgreSQL.
 
 ---
 
@@ -143,16 +154,19 @@ The application creates all database tables automatically on first launch. No ma
 
 No setup required. A file called `pcod_app.db` will be created automatically in the project root when you first run the app.
 
-**Using PostgreSQL (optional):**
+**Using PostgreSQL with your SQL dump file:**
 
-1. Create a database in PostgreSQL:
-   ```sql
-   CREATE DATABASE cystasense;
-   ```
-2. Set your `DATABASE_URL` in `.env`:
+For detailed instructions on setting up PostgreSQL and loading your `dump.sql` file, see **[POSTGRES_SETUP.md](POSTGRES_SETUP.md)**.
+
+Quick summary:
+1. Install PostgreSQL
+2. Create a database: `CREATE DATABASE cystasense;`
+3. Load your dump file: `./load_database.sh` or `psql -U postgres -d cystasense -f dump.sql`
+4. Set your `DATABASE_URL` in `.env`:
    ```env
    DATABASE_URL=postgresql://your_username:your_password@localhost:5432/cystasense
    ```
+5. Verify connection: `python verify_db.py`
 
 ---
 
